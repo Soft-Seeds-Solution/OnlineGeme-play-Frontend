@@ -1,0 +1,49 @@
+{
+  "name": "gamingfront",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "dompurify": "^3.3.1",
+    "fs": "^0.0.1-security",
+    "keen-slider": "^6.8.6",
+    "node-fetch": "^3.3.2",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^7.2.0",
+    "react-select": "^5.10.2",
+    "react-slick": "^0.30.3",
+    "react-snap": "^1.23.0",
+    "sitemap": "^9.0.0",
+    "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.17.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.19.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "globals": "^15.14.0",
+    "vite": "^6.1.0"
+  }
+}

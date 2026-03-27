@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# Block Admin Panel
+Disallow: /adminPanel/
+
+# Block API routes
+Disallow: /api/
+
+# Block search pages
+Disallow: /search
+Disallow: /search?
+
+# Block URLs with parameters
+Disallow: /*?
+
+# Allow important directories
+Allow: /category/
+
+# Sitemap
+Sitemap: https://www.khelogy.com/sitemap.xml
+Sitemap: https://www.khelogy.com/sitemap-action.xml
+Sitemap: https://www.khelogy.com/sitemap-adventure.xml
+Sitemap: https://www.khelogy.com/sitemap-arcade.xml
+Sitemap: https://www.khelogy.com/sitemap-casual.xml
+Sitemap: https://www.khelogy.com/sitemap-puzzle.xml
+Sitemap: https://www.khelogy.com/sitemap-racing.xml
+Sitemap: https://www.khelogy.com/sitemap-shooting.xml
+Sitemap: https://www.khelogy.com/sitemap-simulation.xml
+Sitemap: https://www.khelogy.com/sitemap-sports.xml
+Sitemap: https://www.khelogy.com/sitemap-strategy.xml

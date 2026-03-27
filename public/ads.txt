@@ -1,0 +1,7 @@
+#SENDWEBPUSH
+sendwebpush.com, 68f7c4a1db167, DIRECT
+
+google.com, pub-9597097359230576, RESELLER, f08c47fec0942fa0
+google.com, pub-8661077396692334, DIRECT, f08c47fec0942fa0
+google.com, pub-9974159700444105, DIRECT, f08c47fec0942fa0
+google.com, pub-9397150258043558, DIRECT, f08c47fec0942fa0
