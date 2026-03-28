@@ -55,21 +55,13 @@ import GameTagPage from './Pages/GameTagPage';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Loader from './Pages/Loader';
+import GameContext from './ContextApi/GameContext';
+import GameCatContext from './ContextApi/GameCatContext';
 
 function App() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500); // ✅ 1 second loader
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <>
-      {loading && <Loader />} {/* ✅ Overlay */}
       <Router>
         <GameCatProvider>
           <GameProvider>
@@ -103,6 +95,16 @@ function GameRoutes() {
   usePageTracking()
   const { signUser } = useContext(UserContext)
   const { pathname } = useLocation()
+  const { AllGames } = useContext(GameContext);
+  const { categories } = useContext(GameCatContext);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (AllGames?.length > 0 || categories?.length > 0) {
+      setLoading(false);
+    }
+  }, [AllGames, categories]);
 
   const subRoutes = [
     { path: "/", module: <GamePage /> },
@@ -158,6 +160,7 @@ function GameRoutes() {
 
   return (
     <>
+      {loading && <Loader />}
       <Routes>
 
         {subRoutes.map((routes, index) => (

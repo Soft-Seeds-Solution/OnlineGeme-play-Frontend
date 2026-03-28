@@ -4,7 +4,7 @@ export default function Loader() {
       <div className="loader-container">
         <div className="ring"></div>
         <div className="ring ring-delay"></div>
-        <h4 className="loading-text">Welcome To Khelogy</h4>
+        <h4 className="loading-text">Loading</h4>
       </div>
     </div>
   );

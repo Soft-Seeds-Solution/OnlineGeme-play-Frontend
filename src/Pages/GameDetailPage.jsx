@@ -619,7 +619,7 @@ export default function GameDetailPage() {
 
                 {selectedGame ? (
                     <>
-                        {/* <Container className="my-5">
+                        <Container className="my-5">
                             <div style={{ backgroundColor: "var(--dark-bg)", borderRadius: "15px" }} className="p-4">
                                 <h2 className="heading-color text-white">Related Games</h2>
                                 <div
@@ -650,7 +650,7 @@ export default function GameDetailPage() {
                                     ))}
                                 </div>
                             </div>
-                        </Container> */}
+                        </Container>
                         <Container fluid className=" my-4 gameDetail" style={{ borderRadius: "8px" }}>
                             <Row>
                                 <Col md={7}>

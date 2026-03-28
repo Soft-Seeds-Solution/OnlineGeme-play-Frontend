@@ -29,20 +29,29 @@ function GameProvider({ children }) {
 
         setAllGames(approvedGame);
     };
+    
     const uploadedGames = async () => {
-        const url = "https://edge.khelogy.com/api/games/uploadedd-games";
+        try {
+            const res = await fetch("https://edge.khelogy.com/api/games/uploadedd-games");
 
-        const res = await fetch(url);
+            if (!res.ok) throw new Error("Fetch failed");
 
-        const data = await res.json();
+            const data = await res.json();
 
-        setAllStatusGames(data);
+            setAllStatusGames(data);
 
-        const approvedGame = data
-            ?.filter(game => game.status !== "Pending" && game.status !== "Rejected")
-            .filter(game => game.gameStatus !== "UnPublish");
+            setAllGames(
+                data?.filter(
+                    (game) =>
+                        game.status !== "Pending" &&
+                        game.status !== "Rejected" &&
+                        game.gameStatus !== "UnPublish"
+                )
+            );
 
-        setAllGames(approvedGame);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const purgeGameCache = async () => {
@@ -107,8 +116,7 @@ function GameProvider({ children }) {
             method: "PUT"
         });
         purgeGameCache()
-        uploadedCacheGames
-            (true);
+        uploadedCacheGames(true);
         Swal.fire("Indexed!", "This game add to index successfully.", "success");
     };
     const updateGameToNoIndexFn = async (id) => {
