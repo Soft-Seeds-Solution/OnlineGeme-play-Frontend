@@ -13,14 +13,14 @@ document.write(`
   </div>
 
   <!-- FALLBACK Interstitial -->
-  <div id="customInterstitial" class="no-ad-blur" style="display:none;">
-    <div class="no-ad-text">Ad Loading...</div>
-  </div>
+  <div id="customInterstitial" class="no-ad-blur">
+  <div class="no-ad-text">Ad Not Found</div>
+</div>
 
   <!-- FALLBACK Rewarded -->
-  <div id="customRewarded" class="no-ad-blur" style="display:none;">
-    <div class="no-ad-text">Ad Loading...</div>
-  </div>
+  <div id="customRewarded" class="no-ad-blur">
+  <div class="no-ad-text">Ad Not Found</div>
+</div>
 `);
 
 // ---------------------------------------
@@ -87,14 +87,25 @@ function tryShowAdinPlayInterstitial() {
   }
 }
 
+// ---------------------------------------
+// INTERSTITIAL FALLBACK
+// ---------------------------------------
 function showInterstitialFallback() {
-  document.getElementById("customInterstitial").style.display = "block";
+  const el = document.getElementById("customInterstitial");
+
+  el.style.display = "flex";
+  setTimeout(() => el.classList.add("show"), 50);
+
   setTimeout(closeInterstitial, 4000);
 }
 
 function closeInterstitial() {
+  const el = document.getElementById("customInterstitial");
+
+  el.classList.remove("show");
+  setTimeout(() => el.style.display = "none", 300);
+
   document.getElementById("interstitialAd").style.display = "none";
-  document.getElementById("customInterstitial").style.display = "none";
 
   if (window.gameInstance)
     gameInstance.SendMessage("ShowAd", "OnInterstitialComplete");
@@ -128,14 +139,25 @@ function tryShowAdinPlayRewarded() {
   }
 }
 
+// ---------------------------------------
+// REWARDED FALLBACK
+// ---------------------------------------
 function showRewardedFallback() {
-  document.getElementById("customRewarded").style.display = "block";
+  const el = document.getElementById("customRewarded");
+
+  el.style.display = "flex";
+  setTimeout(() => el.classList.add("show"), 50);
+
   setTimeout(closeRewarded, 4000);
 }
 
 function closeRewarded() {
+  const el = document.getElementById("customRewarded");
+
+  el.classList.remove("show");
+  setTimeout(() => el.style.display = "none", 300);
+
   document.getElementById("rewardedAd").style.display = "none";
-  document.getElementById("customRewarded").style.display = "none";
 
   if (window.gameInstance)
     gameInstance.SendMessage("ShowAd", "OnRewardedComplete");

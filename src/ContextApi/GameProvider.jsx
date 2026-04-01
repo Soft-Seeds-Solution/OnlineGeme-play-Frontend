@@ -29,7 +29,7 @@ function GameProvider({ children }) {
 
         setAllGames(approvedGame);
     };
-    
+
     const uploadedGames = async () => {
         try {
             const res = await fetch("https://edge.khelogy.com/api/games/uploadedd-games");
