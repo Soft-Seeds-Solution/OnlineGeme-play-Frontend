@@ -96,7 +96,7 @@ function showInterstitialFallback() {
   el.style.display = "flex";
   setTimeout(() => el.classList.add("show"), 50);
 
-  setTimeout(closeInterstitial, 4000);
+  setTimeout(closeInterstitial, 2000);
 }
 
 function closeInterstitial() {
@@ -148,7 +148,7 @@ function showRewardedFallback() {
   el.style.display = "flex";
   setTimeout(() => el.classList.add("show"), 50);
 
-  setTimeout(closeRewarded, 4000);
+  setTimeout(closeRewarded, 2000);
 }
 
 function closeRewarded() {
