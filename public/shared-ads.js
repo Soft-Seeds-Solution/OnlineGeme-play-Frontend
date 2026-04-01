@@ -14,12 +14,12 @@ document.write(`
 
   <!-- FALLBACK Interstitial -->
   <div id="customInterstitial" class="no-ad-blur">
-  <div class="no-ad-text">Ad Not Found</div>
+  <div class="no-ad-text">Ads Not Found</div>
 </div>
 
   <!-- FALLBACK Rewarded -->
   <div id="customRewarded" class="no-ad-blur">
-  <div class="no-ad-text">Ad Not Found</div>
+  <div class="no-ad-text">Ads Not Found</div>
 </div>
 `);
 
