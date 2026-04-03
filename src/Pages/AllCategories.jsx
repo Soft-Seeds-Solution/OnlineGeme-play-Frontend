@@ -18,12 +18,6 @@ function AllCategories() {
                                 <Link to={`/category/${category?.catUrl}`} className="nav-link">
                                     <div className="d-flex px-2 py-3 align-items-center gap-2 mb-3 cat-bar">
                                         <Image src={category?.logo}
-                                            style={{
-                                                width: "20%",
-                                                backgroundColor: "var(--blue-color)",
-                                                borderRadius: "50px"
-                                            }}
-                                            className="p-2"
                                         />
                                         <h5 className="game-Titles">{category?.category}</h5>
                                     </div>

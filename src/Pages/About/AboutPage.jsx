@@ -1,6 +1,7 @@
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Image, Row } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import leaderImg1 from "../../assets/leaderImg.jpeg"
 
 export default function AboutPage() {
     return (
@@ -20,9 +21,9 @@ export default function AboutPage() {
             <section>
                 <Container className="py-5">
                     <Row className="align-items-center justify-content-between">
-                        <h2>Core Values</h2>
-                        <p>The Principles that guide every decision we make and every product we build</p>
-                        <Col md={3} className="aboutCards">
+                        <h2 className="text-center">Core Values</h2>
+                        <p className="text-center">The Principles that guide every decision we make and every product we build</p>
+                        <Col md={3} className="aboutCards mt-3">
                             <FontAwesomeIcon icon={faEye}></FontAwesomeIcon>
                             <h4>Integrity</h4>
                             <p>We believe in honest work and transparent communication. We do the right thing, even when no one is watching.</p>
@@ -42,13 +43,13 @@ export default function AboutPage() {
             </section>
             <section>
                 <Container className="py-5">
-                    <Row className="align-items-center justify-content-between">
-                        <h2>Our Journey</h2>
-                        <p>A decade of growth, innovation, and impact.</p>
-                        <Row className="justify-content-center">
+                    <Row className="align-items-center justify-content-center">
+                        <h2 className="text-center">Our Journey</h2>
+                        <p className="text-center">A decade of growth, innovation, and impact.</p>
+                        <Row className="justify-content-center mt-3">
                             <Col md={4} className="journey-after mt-3 align-items-end">
-                                2014
-                                The Begginning
+                                <p>2014</p>
+                                <p>The Begginning</p>
                                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ab, consequuntur.</p>
                             </Col>
                             <Col md={4}></Col>
@@ -56,15 +57,15 @@ export default function AboutPage() {
                         <Row className="justify-content-center">
                             <Col md={4}></Col>
                             <Col md={4} className="journey-after mt-3 align-items-end">
-                                2014
-                                The Begginning
+                                <p>2014</p>
+                                <p>The Begginning</p>
                                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ab, consequuntur.</p>
                             </Col>
                         </Row>
                         <Row className="justify-content-center">
                             <Col md={4} className="journey-after mt-3 align-items-end">
-                                2014
-                                The Begginning
+                                <p>2014</p>
+                                <p>The Begginning</p>
                                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ab, consequuntur.</p>
                             </Col>
                             <Col md={4}></Col>
@@ -72,12 +73,46 @@ export default function AboutPage() {
                         <Row className="justify-content-center">
                             <Col md={4}></Col>
                             <Col md={4} className="journey-after mt-3 align-items-end">
-                                2014
-                                The Begginning
+                                <p>2014</p>
+                                <p>The Begginning</p>
                                 <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ab, consequuntur.</p>
                             </Col>
                         </Row>
 
+                    </Row>
+                </Container>
+            </section>
+            <section>
+                <Container className="py-5">
+                    <Row className="align-items-center justify-content-center">
+                        <h2 className="text-center">Meet The Leadership</h2>
+                        <p className="text-center">A decade of growth, innovation, and impact.</p>
+                        <Row className="justify-content-center mt-3">
+                            <Col md={3}>
+                                <Image src={leaderImg1} fluid></Image>
+                                <h4 className="mt-2">Name Goes Here</h4>
+                                <p>Profession</p>
+                                <p>Lorem ipsum dolor sit amet.</p>
+                            </Col>
+                            <Col md={3}>
+                                <Image src={leaderImg1} fluid></Image>
+                                <h4 className="mt-2">Name Goes Here</h4>
+                                <p>Profession</p>
+                                <p>Lorem ipsum dolor sit amet.</p>
+                            </Col>
+                            <Col md={3}>
+                                <Image src={leaderImg1} fluid></Image>
+                                <h4 className="mt-2">Name Goes Here</h4>
+                                <p>Profession</p>
+                                <p>Lorem ipsum dolor sit amet.</p>
+                            </Col>
+                            <Col md={3}>
+                                <Image src={leaderImg1} fluid></Image>
+                                <h4 className="mt-2">Name Goes Here</h4>
+                                <p>Profession</p>
+                                <p>Lorem ipsum dolor sit amet.</p>
+                            </Col>
+                        </Row>
                     </Row>
                 </Container>
             </section>

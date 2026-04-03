@@ -860,6 +860,7 @@ body.fullscreen-active {
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 8px;
+    border: none;
 }
 
 .login-form input,
@@ -1098,4 +1099,5 @@ body.fullscreen-active {
         opacity: 0.3;
     }
 }
+
 /* git remote add origin https://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@github.com/Soft-Seeds-Solution/OnlineGeme-play-Frontend.git */

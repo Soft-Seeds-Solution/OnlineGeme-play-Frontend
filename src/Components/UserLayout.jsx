@@ -1,4 +1,4 @@
-import { Nav } from "react-bootstrap";
+import { Image, Nav } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../ContextApi/UserContext";
@@ -99,8 +99,8 @@ function UserLayout() {
                     to={`/category/${category?.catUrl}`}
                     className="category-item mt-3 d-flex align-items-center"
                 >
-                    {/* <Image src={category.logo} className="category-icon" alt={category.category} /> */}
-                    <FontAwesomeIcon icon={faGamepad}></FontAwesomeIcon>
+                    <Image src={category.logo} style={{ width: "35px" }} alt={category.category} />
+                    {/* <FontAwesomeIcon icon={faGamepad}></FontAwesomeIcon> */}
                     <span className="category-name text-dark">{category.category}</span>
                 </Nav.Link>
             ))}
