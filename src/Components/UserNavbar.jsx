@@ -140,7 +140,7 @@ function UserNavbar() {
                                     <span>Home</span>
                                 </Nav>
                             </Link>
-                            {/* <Link to="/about-us" className={`header-text ${isActive("/about-us") ? "activeHeader" : ""}`}>
+                            <Link to="/about-us" className={`header-text ${isActive("/about-us") ? "activeHeader" : ""}`}>
                                 <Nav className="me-3 d-flex align-items-center">
                                     <FontAwesomeIcon icon={faInfoCircle} className="p-1 me-2 icon" />
                                     <span>About</span>
@@ -151,7 +151,7 @@ function UserNavbar() {
                                     <FontAwesomeIcon icon={faAddressBook} className="p-1 me-2 icon" />
                                     <span>Contact</span>
                                 </Nav>
-                            </Link> */}
+                            </Link>
                         </Nav>
                     </div>
 

@@ -36,7 +36,6 @@ import RejectedGames from './AdminSide/Games/RejectedGames';
 import UserLayout from './Components/UserLayout';
 import { HelmetProvider } from 'react-helmet-async';
 import UploadedGamesRecord from './UserSide/UploadedGamesRecord';
-import ExportGamesToJson from './ExportedGamesToJson';
 import usePageTracking from './hook/UsePageTracking';
 import UploadBlog from './AdminSide/Blogs/AddBlog';
 import BlogsProvider from './ContextApi/BlogsProvider';
@@ -73,7 +72,7 @@ function App() {
                     <UserNavbar />
                     {/* <PrefetchGames /> */}
                     <UserLayout />
-                    <ExportGamesToJson />
+                    {/* <ExportGamesToJson /> */}
                     <HelmetProvider>
                       <GameRoutes />
                     </HelmetProvider>

@@ -3,8 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../ContextApi/UserContext";
 // import { useKeenSlider } from "keen-slider/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 
 function UserLayout() {
     const { catHover, setCatHover } = useContext(UserContext);
@@ -99,7 +97,7 @@ function UserLayout() {
                     to={`/category/${category?.catUrl}`}
                     className="category-item mt-3 d-flex align-items-center"
                 >
-                    <Image src={category.logo} style={{ width: "35px" }} alt={category.category} />
+                    <Image src={category.logo} className="me-2" style={{ width: "30px" }} alt={category.category} />
                     {/* <FontAwesomeIcon icon={faGamepad}></FontAwesomeIcon> */}
                     <span className="category-name text-dark">{category.category}</span>
                 </Nav.Link>

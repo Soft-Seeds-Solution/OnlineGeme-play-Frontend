@@ -3,7 +3,7 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import emailjs from "@emailjs/browser"
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVoicemail } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faLocation, faPhone, faVoicemail } from "@fortawesome/free-solid-svg-icons";
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -75,38 +75,36 @@ export default function ContactPage() {
                     </Col>
                     <Col md={5}>
                         <Row className="g-4">
-                            <Col md={6}>
-                                <div className="d-flex align-items-center">
-                                    <FontAwesomeIcon className="me-2" icon={faVoicemail}></FontAwesomeIcon>
+                            <Col md={7}>
+                                <div className="d-flex">
+                                    <FontAwesomeIcon className="me-2" icon={faEnvelope}></FontAwesomeIcon>
                                     <div>
-                                        <p>Email Us</p>
-                                        <p>emailhere@gmail.com</p>
-                                        <p>emailhere@gmail.com</p>
+                                        <h5 className="sub-heading">Email Us</h5>
+                                        <p>softseedssolution@gmail.com</p>
                                     </div>
                                 </div>
                             </Col>
-                            <Col md={6}>
-                                <div className="d-flex align-items-center">
-                                    <FontAwesomeIcon className="me-2" icon={faVoicemail}></FontAwesomeIcon>
+                            <Col md={5}>
+                                <div className="d-flex">
+                                    <FontAwesomeIcon className="me-2" icon={faPhone}></FontAwesomeIcon>
                                     <div>
-                                        <p>Call Us</p>
-                                        <p>0000000000000</p>
-                                        <p>0000000000000</p>
+                                        <h5 className="sub-heading">Call Us</h5>
+                                        <p>+923474192493</p>
                                     </div>
                                 </div>
                             </Col>
                             <Col md={9}>
-                                <div className="d-flex align-items-center">
-                                    <FontAwesomeIcon className="me-2" icon={faVoicemail}></FontAwesomeIcon>
+                                <div className="d-flex">
+                                    <FontAwesomeIcon className="me-2" icon={faLocation}></FontAwesomeIcon>
                                     <div>
-                                        <p>Visit Our Studio</p>
-                                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, eius?</p>
+                                        <h5 className="sub-heading">Visit Our Studio</h5>
+                                        <p>337 Sultan Ahmed Road, Near Wahdat Road, G Block Rehmanpura Colony, Ichra Lahore, 54000, Pakistan</p>
                                     </div>
                                 </div>
                             </Col>
                         </Row>
-                        <Col md={12}>
-                            <iframe className="mt-4" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13602.744629615981!2d74.31834674999999!3d31.5327787!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3919049bf02720f9%3A0x4295a66061acf664!2sIchhra%20Lahore%2C%2054000%2C%20Pakistan!5e0!3m2!1sen!2s!4v1775199499174!5m2!1sen!2s" style={{ border: 0, width: "100%", height: "250px" }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                        <Col md={12} className="mt-3">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d13604.283235752857!2d74.3135405!3d31.5222151!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391904838334dd3d%3A0xb94b19675c74b96f!2sG8F8%2B7QH%2C%20337%20Sultan%20Ahmed%20Rd%2C%20near%20Wahdat%20Road%2C%20G%20Block%20Rehmanpura%20Colony%2C%20Lahore%2C%2054000%2C%20Pakistan!5e0!3m2!1sen!2s!4v1775221345934!5m2!1sen!2s" style={{ border: 0, width: "100%", height: "250px" }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                         </Col>
                     </Col>
                 </Row>

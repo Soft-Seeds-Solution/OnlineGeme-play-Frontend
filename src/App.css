@@ -1050,9 +1050,6 @@ body.fullscreen-active {
 }
 
 /* Container */
-.loader-container {
-    text-align: center;
-}
 
 /* Rings */
 .ring {
@@ -1063,6 +1060,7 @@ body.fullscreen-active {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     position: absolute;
+    margin-left: 20px;
 }
 
 .ring-delay {

@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useContext, useRef, useState } from "react";
 import GameContext from "../ContextApi/GameContext";
 import GameCatContext from "../ContextApi/GameCatContext";
-import { Col, Container, Image, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import generalGameThumbnail from "../assets/defaultGameThumbnail.jpg";
 import { Helmet } from "react-helmet-async";
 
@@ -147,22 +147,6 @@ export default function GameCatPage() {
 
                     </Row>
 
-                    {/* Direct Subcategories */}
-                    <section>
-                        <Row>
-                            {directSubCategories.map((cat) => (
-                                <Col key={cat._id} md={3}>
-                                    <Link to={`/category/${cat.catUrl}`}>
-                                        <div className="d-flex px-2 py-3 align-items-center gap-2 mb-3 cat-bar">
-                                            <Image src={cat.logo} style={{ width: "20%", borderRadius: "50px", backgroundColor: "var(--blue-color)" }} className="p-2" />
-                                            <p className="game-Titles">{cat.category}</p>
-                                        </div>
-                                    </Link>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-
                     {/* Games Grid */}
                     <Row className="g-3 mt-3">
                         {categoryGames.map((game, index) => (
@@ -194,10 +178,27 @@ export default function GameCatPage() {
                 </Row>
             </Container>
 
-            {/* Category Description & FAQs */}
-            <Container fluid className="mt-5">
-                <Row className="g-3">
 
+            {/* Category Description & FAQs */}
+            <Container fluid className="mt-4">
+                {/* Direct Subcategories */}
+                <section>
+                    <Row>
+                        <h2 className="sub-heading">Related Categories</h2>
+                        {directSubCategories.map((cat) => (
+                            <Col key={cat._id} md={3}>
+                                <Link to={`/category/${cat.catUrl}`}>
+                                    <div className="d-flex px-2 py-3 align-items-center gap-2 my-3 cat-bar">
+                                        {/* <Image src={cat.logo} style={{ width: "20%", borderRadius: "50px", backgroundColor: "var(--blue-color)" }} className="p-2" /> */}
+                                        <p className="game-Titles">{cat.category}</p>
+                                    </div>
+                                </Link>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
+                <Row className="g-3">
+                    <h2 className="sub-heading">Description</h2>
                     {selectedCategoryObj?.description && (
                         <>
 

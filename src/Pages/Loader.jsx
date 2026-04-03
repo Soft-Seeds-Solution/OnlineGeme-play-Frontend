@@ -1,6 +1,6 @@
 export default function Loader() {
   return (
-    <div className="loader-overlay">
+    <div className="loader-overlay d-flex justify-content-center align-items-center">
       <div className="loader-container">
         <div className="ring"></div>
         <div className="ring ring-delay"></div>
