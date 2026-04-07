@@ -8,6 +8,7 @@ import apiUrl from "../../ApiEndpoint";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
 import Select from "react-select";
+import GameCatContext from "../../ContextApi/GameCatContext";
 // import UserContext from "../../ContextApi/UserContext";
 
 export default function EditUploadedGame({ gameId }) {
@@ -18,6 +19,7 @@ export default function EditUploadedGame({ gameId }) {
     const [allTags, setAllTags] = useState([])
     const categoryOptions = [];
     const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } = useContext(GameContext)
+    const { categories } = useContext(GameCatContext)
     // const { signUser } = useContext(UserContext)
 
     /* ================= MULTI LANGUAGE SETUP ================= */
@@ -228,18 +230,6 @@ export default function EditUploadedGame({ gameId }) {
         setGameById({ ...gameById, controls: html });
     };
 
-    // category
-    const [categories, setCategories] = useState([]);
-
-    const fetchCategories = async () => {
-        const res = await fetch(`${apiUrl}/api/category/nestedCategories`);
-        const data = await res.json();
-        setCategories(data);
-    };
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
     const buildOptions = (cats, level = 0) => {
         cats?.forEach(cat => {
             categoryOptions.push({
@@ -257,7 +247,7 @@ export default function EditUploadedGame({ gameId }) {
 
     // Tags
     const fetchTags = async () => {
-        const res = await fetch(`${apiUrl}/api/tags/allTags`);
+        const res = await fetch("https://edge.khelogy.com/api/tags/allTags");
         const data = await res.json();
         setAllTags(data);
     };

@@ -3,7 +3,7 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import emailjs from "@emailjs/browser"
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faLocation, faPhone, faVoicemail } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faLocation, faPhone } from "@fortawesome/free-solid-svg-icons";
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
