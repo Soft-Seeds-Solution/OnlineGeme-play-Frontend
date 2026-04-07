@@ -19,9 +19,8 @@ export default function AboutPage() {
                 <section>
                     <Row>
 
-                        <div style={{ border: "1px solid black", borderRadius: "5px" }} className="mt-3 bg-white py-2 d-flex align-items-center justify-content-between">
-                            <p>Suggested CTA Buttons</p>
-                            <Link to="/"> <Button className="btn">Play Games</Button></Link>
+                        <div className="mt-3 py-2 d-flex align-items-center justify-content-center">
+                            <Link to="/"> <Button className="btn me-3">Play Games</Button></Link>
                             <Link to="/all-categories"><Button className="btn">Browse Categories</Button></Link>
                         </div>
 
@@ -60,7 +59,7 @@ export default function AboutPage() {
                                 laying style.</p>
                         </div>
 
-                        <div className="bg-white mt-2 p-2">
+                        <div className="mt-2 p-2">
                             <h2 className="sub-heading">Our Mission</h2>
                             <p>Our mission is simple:</p>
                             <p>To make free online gaming enjoyable, accessible, and convenient for everyone.</p>
@@ -129,9 +128,8 @@ export default function AboutPage() {
                             <p>Start exploring today and discover your next favorite game on Kelogy.</p>
                         </div>
 
-                        <div style={{ border: "1px solid black", borderRadius: "5px" }} className="mt-3 bg-white py-2 d-flex align-items-center justify-content-between">
-                            <p>Suggested CTA Buttons</p>
-                            <Link to="/"> <Button className="btn">Start Playing</Button></Link>
+                        <div className="mt-3 py-2 d-flex align-items-center justify-content-center">
+                            <Link to="/"> <Button className="btn me-3">Start Playing</Button></Link>
                             <Link to="/all-categories"><Button className="btn">Explore All Games</Button></Link>
                         </div>
                     </Row>

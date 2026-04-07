@@ -20,7 +20,9 @@ export default function UploadedGames() {
 
     const filterGames = userGames?.filter(game => game.gameStatus !== "UnPublish").filter(gameData => gameData.featureGame !== "Yes").filter(gameData => gameData.title.en.toLowerCase().includes(searchTitle.toLowerCase()))
 
-    const filteredAndSortedGames = [...filterGames].reverse();
+    const filteredAndSortedGames = [...filterGames].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
     const updateGameToIndexFn = async (id) => {
         await fetch(`${apiUrl}/api/games/updateGameToIndex/${id}`, {

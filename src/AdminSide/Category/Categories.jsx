@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
-import { useLocation } from "react-router-dom";
 import GameCatContext from "../../ContextApi/GameCatContext";
 import { useContext } from "react";
 
@@ -13,7 +12,6 @@ export default function Categories() {
     const [categories, setCategories] = useState([]);
     const [searchTitle, setSearchTitle] = useState("")
     const [currentPage, setCurrentPage] = useState(1);
-    const location = useLocation()
     const itemsPerPage = 25;
     const { purgeCache } = useContext(GameCatContext)
     const [getCatDataById, setGetCatDataById] = useState({});
@@ -33,9 +31,7 @@ export default function Categories() {
 
     useEffect(() => {
         fetchCategories();
-    }, [location.pathname]);
-
-    const filterCats = categories?.filter(catData => catData.category.toLowerCase().includes(searchTitle.toLowerCase()))
+    }, []);
 
     const updateCatToIndexFn = async (id) => {
         await fetch(`${apiUrl}/api/category/updateCatToIndex/${id}`, {
@@ -54,6 +50,7 @@ export default function Categories() {
         Swal.fire("NoIndexed!", "This game add to noIndex successfully.", "success");
     };
 
+    // ✅ Move this function ABOVE usage
     const flattenCategories = (cats, level = 0) => {
         let result = [];
 
@@ -71,7 +68,13 @@ export default function Categories() {
         return result;
     };
 
-    const flatCategories = flattenCategories(filterCats);
+    // ✅ Flatten ALL categories first
+    const flatCategories = flattenCategories(categories);
+
+    // ✅ Then filter (this fixes subcategory search)
+    const filteredCategories = flatCategories.filter(cat =>
+        cat.category.toLowerCase().includes(searchTitle.toLowerCase())
+    );
 
     const changeIndexFn = (gameIndex, id) => {
         if (gameIndex === "index") {
@@ -236,9 +239,9 @@ export default function Categories() {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-    const currentCategories = flatCategories.slice(indexOfFirstItem, indexOfLastItem);
+    const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(flatCategories.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
     return (
         <>
