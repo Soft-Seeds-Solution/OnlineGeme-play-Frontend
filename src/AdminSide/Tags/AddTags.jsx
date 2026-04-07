@@ -15,7 +15,7 @@ export default function AddTags() {
     const [getTagById, setGetTagById] = useState([])
 
     const fetchTags = async () => {
-        const res = await fetch("https://edge.khelogy.com/api/tags/allTags");
+        const res = await fetch(`${apiUrl}/api/tags/allTags`);
         const data = await res.json();
         setAllTags(data);
     };
