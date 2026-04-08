@@ -15,7 +15,7 @@ function GameProvider({ children }) {
     const uploadedCacheGames = async () => {
         const url = "https://edge.khelogy.com/api/games/uploadedd-games?fresh=1"
 
-        const res = await fetch(url, {
+        const res = await fetch(url + "&t=" + Date.now(), {
             cache: "no-store"
         });
 

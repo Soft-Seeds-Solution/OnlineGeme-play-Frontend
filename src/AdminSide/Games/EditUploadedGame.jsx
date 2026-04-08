@@ -1,28 +1,33 @@
 import { useContext, useState, useEffect } from "react";
 import { Button, Form, Image, Modal, Nav } from "react-bootstrap";
 import GameContext from "../../ContextApi/GameContext";
+import GameCatContext from "../../ContextApi/GameCatContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 import apiUrl from "../../ApiEndpoint";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
 import Select from "react-select";
-import GameCatContext from "../../ContextApi/GameCatContext";
-// import UserContext from "../../ContextApi/UserContext";
 
 export default function EditUploadedGame({ gameId }) {
+    const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } =
+        useContext(GameContext);
+    const { categories } = useContext(GameCatContext);
+
+    const [gameEditModal, setGameEditModal] = useState(false);
+    const [activeTab, setActiveTab] = useState("form");
+
+    const [allTags, setAllTags] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
-    const [gameEditModal, setGameEditModal] = useState(false)
-    const [activeTab, setActiveTab] = useState("form");
-    const [allTags, setAllTags] = useState([])
-    const categoryOptions = [];
-    const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } = useContext(GameContext)
-    const { categories } = useContext(GameCatContext)
-    // const { signUser } = useContext(UserContext)
 
-    /* ================= MULTI LANGUAGE SETUP ================= */
+    const [selectedLanguages, setSelectedLanguages] = useState({
+        title: ["en"],
+        shortDes: ["en"],
+        description: ["en"],
+        keywords: ["en"],
+    });
 
     const languages = [
         { code: "en", label: "English" },
@@ -32,80 +37,80 @@ export default function EditUploadedGame({ gameId }) {
         { code: "es", label: "Spanish" },
     ];
 
-    const [selectedLanguages, setSelectedLanguages] = useState({
-        title: ["en"],
-        shortDes: ["en"],
-        description: ["en"],
-        keywords: ["en"],
-    });
+    // Build category options
+    const categoryOptions = [];
+    const buildOptions = (cats, level = 0) => {
+        cats?.forEach((cat) => {
+            categoryOptions.push({
+                value: cat._id,
+                label: `${"— ".repeat(level)} ${cat.category}`,
+            });
+            if (cat.children?.length) buildOptions(cat.children, level + 1);
+        });
+    };
+    buildOptions(categories);
 
-    /* ================= OPEN MODAL ================= */
+    // Fetch all tags once
+    useEffect(() => {
+        const fetchTags = async () => {
+            const res = await fetch("https://edge.khelogy.com/api/tags/allTags");
+            const data = await res.json();
+            setAllTags(data);
+        };
+        fetchTags();
+    }, []);
 
+    const tagOptions = allTags?.map((tag) => ({ value: tag._id, label: tag.tags }));
+
+    // Open modal only after game data fetched
     const openEditGame = async () => {
+        setSelectedCategories([]);
+        setSelectedTags([]);
         setGameById({});
+        const data = await getGameById(gameId); // wait for fetch
         setGameEditModal(true);
-        await getGameById(gameId);
     };
 
-    /* ================= DETECT EXISTING LANGUAGES ================= */
-
+    // Update selected categories/tags after game and tags ready
     useEffect(() => {
-        if (!gameById?._id) return;
+        if (!gameById?._id || !allTags.length) return;
 
-        if (gameById?.categories && gameById?.categories.length > 0) {
-            const ids = gameById.categories.map(cat =>
-                typeof cat === "object" ? cat._id : cat
-            );
-
+        // Categories
+        if (gameById.categories?.length) {
+            const ids = gameById.categories.map((c) => (typeof c === "object" ? c._id : c));
             setSelectedCategories(ids);
-
-            setGameById(prev => ({
-                ...prev,
-                categoryIds: ids
-            }));
+            setGameById((prev) => ({ ...prev, categoryIds: ids }));
         }
-        if (gameById?.gameTags && gameById?.gameTags.length > 0) {
-            const ids = gameById.gameTags.map(tag =>
-                typeof tag === "object" ? tag._id : tag
-            );
 
+        // Tags
+        if (gameById.gameTags?.length) {
+            const ids = gameById.gameTags.map((t) => (typeof t === "object" ? t._id : t));
             setSelectedTags(ids);
-
-            setGameById(prev => ({
-                ...prev,
-                gameTags: ids
-            }));
+            setGameById((prev) => ({ ...prev, gameTags: ids }));
         }
 
+        // Languages
         setSelectedLanguages({
             title: Object.keys(gameById.title || { en: "" }),
             shortDes: Object.keys(gameById.shortDes || { en: "" }),
-            description: Object.keys(gameById.description || { en: "" })
+            description: Object.keys(gameById.description || { en: "" }),
         });
-
-    }, [gameById?._id]);
-
-    /* ================= LANGUAGE HANDLER ================= */
+    }, [gameById?._id, allTags]);
 
     const handleLanguageChange = (langCode) => {
-        setSelectedLanguages(prev => {
+        setSelectedLanguages((prev) => {
             const updated = { ...prev };
-            Object.keys(updated).forEach(field => {
-                if (!updated[field].includes(langCode)) {
-                    updated[field].push(langCode);
-                }
+            Object.keys(updated).forEach((field) => {
+                if (!updated[field].includes(langCode)) updated[field].push(langCode);
             });
             return updated;
         });
     };
 
     const handleMultiLangChange = (field, langCode, value) => {
-        setGameById(prev => ({
+        setGameById((prev) => ({
             ...prev,
-            [field]: {
-                ...prev[field],
-                [langCode]: value
-            }
+            [field]: { ...prev[field], [langCode]: value },
         }));
     };
 
@@ -119,51 +124,43 @@ export default function EditUploadedGame({ gameId }) {
                     type="text"
                     placeholder={`${label} (${lang.toUpperCase()})`}
                     value={gameById?.[field]?.[lang] || ""}
-                    onChange={(e) =>
-                        handleMultiLangChange(field, lang, e.target.value)
-                    }
+                    onChange={(e) => handleMultiLangChange(field, lang, e.target.value)}
                 />
             ))}
         </>
     );
 
-    /* ================= FAQ ================= */
+    const onchange = (e) => {
+        const { name, value, type, files } = e.target;
+        const newValue = type === "file" ? files[0] : value;
+        setGameById((prev) => ({ ...prev, [name]: newValue }));
+    };
 
     const addFaq = () => {
-        setGameById(prev => ({
+        setGameById((prev) => ({
             ...prev,
-            faqs: [...(prev.faqs || []), { question: "", answer: "" }]
+            faqs: [...(prev.faqs || []), { question: "", answer: "" }],
         }));
     };
 
     const updateFaq = (index, field, value) => {
         const updatedFaqs = [...(gameById.faqs || [])];
         updatedFaqs[index][field] = value;
-        setGameById(prev => ({ ...prev, faqs: updatedFaqs }));
+        setGameById((prev) => ({ ...prev, faqs: updatedFaqs }));
     };
 
     const removeFaq = (index) => {
         const updatedFaqs = gameById.faqs.filter((_, i) => i !== index);
-        setGameById(prev => ({ ...prev, faqs: updatedFaqs }));
+        setGameById((prev) => ({ ...prev, faqs: updatedFaqs }));
     };
 
-    /* ================= NORMAL ONCHANGE ================= */
-
-    const onchange = (e) => {
-        const { name, value, type, files } = e.target;
-        const newValue = type === "file" ? files[0] : value;
-
-        setGameById(prev => ({
-            ...prev,
-            [name]: newValue,
-        }));
-    };
-
-    /* ================= UPDATE GAME ================= */
+    const handleHowPlayChange = (html) => setGameById({ ...gameById, howToPlay: html });
+    const handleFeatureListChange = (html) =>
+        setGameById({ ...gameById, featureList: html });
+    const handleControlsChange = (html) => setGameById({ ...gameById, controls: html });
 
     const updateGameFn = async (e) => {
-        e.preventDefault()
-
+        e.preventDefault();
         const { isConfirmed } = await Swal.fire({
             title: "Do you want to save the changes?",
             showDenyButton: true,
@@ -171,95 +168,48 @@ export default function EditUploadedGame({ gameId }) {
             confirmButtonText: "Save",
             denyButtonText: `Don't save`,
         });
-
         if (!isConfirmed) return;
 
-        const formData = new FormData()
-
+        const formData = new FormData();
         formData.append("title", JSON.stringify(gameById.title));
         formData.append("shortDes", JSON.stringify(gameById.shortDes));
         formData.append("description", JSON.stringify(gameById.description));
         formData.append("gameKeywords", gameById.gameKeywords);
-
-        if (gameById.categoryIds?.length > 0) {
-            formData.append("categoryIds", JSON.stringify(gameById.categoryIds));
-        }
-        if (gameById.gameTags?.length > 0) {
-            formData.append("gameTags", JSON.stringify(gameById.gameTags));
-        }
-
-        formData.append("thumbnail", gameById.thumbnail)
-        formData.append("video", gameById.video)
-        formData.append("gameUrl", gameById.gameUrl)
-        formData.append("howToPlay", gameById.howToPlay)
-        formData.append("whoCreated", gameById.whoCreated)
-        formData.append("orientation", gameById.orientation)
-        formData.append("featureGame", gameById.featureGame)
-        formData.append("metaTitle", gameById.metaTitle)
-        formData.append("metaDescription", gameById.metaDescription)
-
-        formData.append("recommended", gameById.recommended)
+        formData.append("categoryIds", JSON.stringify(gameById.categoryIds || []));
+        formData.append("gameTags", JSON.stringify(gameById.gameTags || []));
+        formData.append("thumbnail", gameById.thumbnail);
+        formData.append("video", gameById.video);
+        formData.append("gameUrl", gameById.gameUrl);
+        formData.append("howToPlay", gameById.howToPlay);
+        formData.append("whoCreated", gameById.whoCreated);
+        formData.append("orientation", gameById.orientation);
+        formData.append("featureGame", gameById.featureGame);
+        formData.append("metaTitle", gameById.metaTitle);
+        formData.append("metaDescription", gameById.metaDescription);
+        formData.append("recommended", gameById.recommended);
         formData.append("featureList", gameById.featureList);
         formData.append("controls", gameById.controls);
         formData.append("faqs", JSON.stringify(gameById.faqs));
 
         const res = await fetch(`${apiUrl}/api/games/editGame/${gameById?._id}`, {
             method: "PUT",
-            body: formData
-        })
+            body: formData,
+        });
 
         if (res.ok) {
             Swal.fire("Saved!", "", "success");
-            purgeGameCache()
-            uploadedCacheGames(true);
-            setGameEditModal(false)
+            purgeGameCache();
+            uploadedCacheGames();
+            setGameEditModal(false);
         } else {
             Swal.fire("Error saving changes", "", "error");
         }
-    }
-
-    /* ================= UI ================= */
-
-    const handleHowPlayChange = (html) => {
-        setGameById({ ...gameById, howToPlay: html });
-    };
-    const handleFeatureListChange = (html) => {
-        setGameById({ ...gameById, featureList: html });
-    };
-    const handleControlsChange = (html) => {
-        setGameById({ ...gameById, controls: html });
     };
 
-    const buildOptions = (cats, level = 0) => {
-        cats?.forEach(cat => {
-            categoryOptions.push({
-                value: cat._id,
-                label: `${"— ".repeat(level)} ${cat.category}`
-            });
+    console.log(categories);
+    console.log(allTags);
 
-            if (cat.children?.length > 0) {
-                buildOptions(cat.children, level + 1);
-            }
-        });
-    };
 
-    buildOptions(categories);
-
-    // Tags
-    const fetchTags = async () => {
-        const res = await fetch("https://edge.khelogy.com/api/tags/allTags");
-        const data = await res.json();
-        setAllTags(data);
-    };
-
-    useEffect(() => {
-        fetchTags()
-    }, [])
-
-    const tagOptions = allTags?.map(tag => ({
-        value: tag._id,
-        label: tag.tags
-    }));
 
     return (
         <>
@@ -269,15 +219,13 @@ export default function EditUploadedGame({ gameId }) {
                 <Modal.Header closeButton>
                     <Modal.Title>Game Modal</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
                     <Form onSubmit={updateGameFn}>
-
-                        {/* LANGUAGE SELECTOR */}
+                        {/* Language Selector */}
                         <Form.Group>
                             <Form.Label>Add Translations</Form.Label>
                             <div className="d-flex flex-wrap">
-                                {languages.map(lang => (
+                                {languages.map((lang) => (
                                     <Form.Check
                                         key={lang.code}
                                         inline
@@ -290,9 +238,7 @@ export default function EditUploadedGame({ gameId }) {
                             </div>
                         </Form.Group>
 
-                        <Nav variant="tabs"
-                            activeKey={activeTab}
-                            onSelect={(selectedKey) => setActiveTab(selectedKey)}>
+                        <Nav variant="tabs" activeKey={activeTab} onSelect={setActiveTab}>
                             <Nav.Item>
                                 <Nav.Link eventKey="form">Category Form</Nav.Link>
                             </Nav.Item>
@@ -300,110 +246,85 @@ export default function EditUploadedGame({ gameId }) {
                                 <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
                             </Nav.Item>
                         </Nav>
+
                         {activeTab === "form" && (
                             <>
                                 {renderMultiLangInputs("title", "Game Title")}
                                 {renderMultiLangInputs("shortDes", "Short Description")}
                                 {renderMultiLangInputs("description", "Description")}
+
                                 <Form.Label>Categories *</Form.Label>
                                 <Select
                                     isMulti
                                     options={categoryOptions}
                                     value={selectedCategories
-                                        .map((id) => categoryOptions.find(option => option.value === id))
-                                        .filter(Boolean) // remove any undefined in case id is missing
-                                    }
+                                        .map((id) => categoryOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)}
                                     onChange={(selected) => {
-                                        // preserve the order in which the user selects
-                                        const ids = selected.map(item => item.value);
+                                        const ids = selected.map((s) => s.value);
                                         setSelectedCategories(ids);
-
-                                        setGameById(prev => ({
-                                            ...prev,
-                                            categoryIds: ids
-                                        }));
+                                        setGameById((prev) => ({ ...prev, categoryIds: ids }));
                                     }}
                                 />
+
                                 <Form.Label>Tags</Form.Label>
                                 <Select
                                     isMulti
                                     options={tagOptions}
                                     value={selectedTags
-                                        .map((id) => tagOptions.find(option => option.value === id))
-                                        .filter(Boolean) // remove any undefined in case id is missing
-                                    }
+                                        .map((id) => tagOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)}
                                     onChange={(selected) => {
-                                        // preserve the order in which the user selects
-                                        const ids = selected.map(item => item.value);
+                                        const ids = selected.map((s) => s.value);
                                         setSelectedTags(ids);
-
-                                        setGameById(prev => ({
-                                            ...prev,
-                                            gameTags: ids
-                                        }));
+                                        setGameById((prev) => ({ ...prev, gameTags: ids }));
                                     }}
                                 />
 
-                                {/* KEEPING YOUR EXISTING FIELDS SIMPLE */}
-                                <Form.Control className="my-3" type="text" name="gameUrl" value={gameById?.gameUrl || ""} onChange={onchange} placeholder="Game URL" />
+                                <Form.Control
+                                    className="my-3"
+                                    type="text"
+                                    name="gameUrl"
+                                    value={gameById?.gameUrl || ""}
+                                    onChange={onchange}
+                                    placeholder="Game URL"
+                                />
 
-                                <Form.Label>
-                                    Controls
-                                    <span style={{ color: "red" }}>*</span>
-                                </Form.Label>
-                                <ReactQuill
-                                    className="mb-3"
-                                    theme="snow"
-                                    name={gameById?.controls}
-                                    value={gameById?.controls}
-                                    onChange={handleControlsChange}
-                                />
-                                <Form.Label>
-                                    How To Play
-                                    <span style={{ color: "red" }}>*</span>
-                                </Form.Label>
-                                <ReactQuill
-                                    className="mb-3"
-                                    theme="snow"
-                                    name={gameById?.howToPlay}
-                                    value={gameById?.howToPlay}
-                                    onChange={handleHowPlayChange}
-                                />
-                                <Form.Label>
-                                    Feature List
-                                    <span style={{ color: "red" }}>*</span>
-                                </Form.Label>
-                                <ReactQuill
-                                    className="mb-3"
-                                    theme="snow"
-                                    name={gameById?.featureList}
-                                    value={gameById?.featureList}
-                                    onChange={handleFeatureListChange}
-                                />
+                                {/* React Quill Fields */}
+                                <Form.Label>Controls *</Form.Label>
+                                <ReactQuill value={gameById?.controls} onChange={handleControlsChange} />
+                                <Form.Label>How To Play *</Form.Label>
+                                <ReactQuill value={gameById?.howToPlay} onChange={handleHowPlayChange} />
+                                <Form.Label>Feature List *</Form.Label>
+                                <ReactQuill value={gameById?.featureList} onChange={handleFeatureListChange} />
+
+                                {/* Thumbnail */}
                                 <Form.Control className="mb-3" type="file" name="thumbnail" onChange={onchange} />
                                 <Image src={gameById?.thumbnail} style={{ width: "100px" }} />
 
                                 {/* FAQ */}
-                                <div className="mt-3">
-                                    {gameById.faqs?.map((faq, i) => (
-                                        <div key={i}>
-                                            <Form.Control
-                                                className="mb-1"
-                                                placeholder="Question"
-                                                value={faq.question}
-                                                onChange={(e) => updateFaq(i, "question", e.target.value)}
-                                            />
-                                            <Form.Control
-                                                className="mb-2"
-                                                placeholder="Answer"
-                                                value={faq.answer}
-                                                onChange={(e) => updateFaq(i, "answer", e.target.value)}
-                                            />
-                                            <Button size="sm" variant="danger" onClick={() => removeFaq(i)}>Remove</Button>
-                                        </div>
-                                    ))}
-                                    <Button className="mt-2" onClick={addFaq}>+ Add FAQ</Button>
-                                </div>
+                                {gameById.faqs?.map((faq, i) => (
+                                    <div key={i}>
+                                        <Form.Control
+                                            className="mb-1"
+                                            placeholder="Question"
+                                            value={faq.question}
+                                            onChange={(e) => updateFaq(i, "question", e.target.value)}
+                                        />
+                                        <Form.Control
+                                            className="mb-2"
+                                            placeholder="Answer"
+                                            value={faq.answer}
+                                            onChange={(e) => updateFaq(i, "answer", e.target.value)}
+                                        />
+                                        <Button size="sm" variant="danger" onClick={() => removeFaq(i)}>
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Button className="mt-2" onClick={addFaq}>
+                                    + Add FAQ
+                                </Button>
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Feature Game?</Form.Label>
@@ -418,33 +339,44 @@ export default function EditUploadedGame({ gameId }) {
 
                         {activeTab === "seo" && (
                             <>
-                                {/* MULTILINGUAL FIELDS */}
                                 <Form.Control
-                                    type='text'
+                                    type="text"
                                     className="my-3"
                                     placeholder="keyword1, keyword2, keyword3"
-                                    name='gameKeywords'
+                                    name="gameKeywords"
                                     value={gameById?.gameKeywords}
                                     onChange={onchange}
                                 />
-                                <hr />
-
-                                <Form.Control className="mb-3" type="text" name="metaTitle" value={gameById?.metaTitle || ""} onChange={onchange} placeholder="Meta Title" />
-                                <Form.Control className="mb-3" as="textarea" rows={3} name="metaDescription" value={gameById?.metaDescription || ""} onChange={onchange} placeholder="Meta Description" />
+                                <Form.Control
+                                    className="mb-3"
+                                    type="text"
+                                    name="metaTitle"
+                                    value={gameById?.metaTitle || ""}
+                                    onChange={onchange}
+                                    placeholder="Meta Title"
+                                />
+                                <Form.Control
+                                    className="mb-3"
+                                    as="textarea"
+                                    rows={3}
+                                    name="metaDescription"
+                                    value={gameById?.metaDescription || ""}
+                                    onChange={onchange}
+                                    placeholder="Meta Description"
+                                />
                             </>
                         )}
 
                         <div className="text-center mt-4">
                             <Button type="submit">Update Game</Button>
                         </div>
-
                     </Form>
                 </Modal.Body>
             </Modal>
         </>
-    )
+    );
 }
 
 EditUploadedGame.propTypes = {
-    gameId: PropTypes.node.isRequired
-}
+    gameId: PropTypes.node.isRequired,
+};
