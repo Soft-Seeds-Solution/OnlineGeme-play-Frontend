@@ -9,6 +9,8 @@ import apiUrl from "../../ApiEndpoint";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
 import Select from "react-select";
+import AddGameCategory from "../Category/AddGameCategory";
+import CreatableSelect from "react-select/creatable";
 
 export default function EditUploadedGame({ gameId }) {
     const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } =
@@ -67,7 +69,7 @@ export default function EditUploadedGame({ gameId }) {
         setSelectedCategories([]);
         setSelectedTags([]);
         setGameById({});
-        const data = await getGameById(gameId); // wait for fetch
+        await getGameById(gameId); // wait for fetch
         setGameEditModal(true);
     };
 
@@ -256,7 +258,13 @@ export default function EditUploadedGame({ gameId }) {
                                 <Form.Label>Categories *</Form.Label>
                                 <Select
                                     isMulti
+                                    isSearchable   // ✅ enable search
                                     options={categoryOptions}
+                                    placeholder="Search categories..."
+                                    noOptionsMessage={() => "No category found"}
+                                    filterOption={(option, inputValue) =>
+                                        option.label.toLowerCase().includes(inputValue.toLowerCase())
+                                    }
                                     value={selectedCategories
                                         .map((id) => categoryOptions.find((opt) => opt.value === id))
                                         .filter(Boolean)}
@@ -266,18 +274,71 @@ export default function EditUploadedGame({ gameId }) {
                                         setGameById((prev) => ({ ...prev, categoryIds: ids }));
                                     }}
                                 />
-
+                                <AddGameCategory />
                                 <Form.Label>Tags</Form.Label>
-                                <Select
+                                <CreatableSelect
                                     isMulti
+                                    isSearchable
                                     options={tagOptions}
+                                    placeholder="Search or create tags..."
+                                    noOptionsMessage={({ inputValue }) =>
+                                        inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
+                                    }
+
                                     value={selectedTags
                                         .map((id) => tagOptions.find((opt) => opt.value === id))
-                                        .filter(Boolean)}
+                                        .filter(Boolean)
+                                    }
+
                                     onChange={(selected) => {
                                         const ids = selected.map((s) => s.value);
                                         setSelectedTags(ids);
                                         setGameById((prev) => ({ ...prev, gameTags: ids }));
+                                    }}
+
+                                    // ✅ THIS IS MAIN PART
+                                    onCreateOption={async (inputValue) => {
+                                        try {
+                                            // 1. Create tag in backend
+                                            const res = await fetch(`${apiUrl}/api/tags/addTags`, {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify({ tags: inputValue }),
+                                            });
+
+                                            const data = await res.json();
+
+                                            if (!res.ok) {
+                                                Swal.fire("Error", data.message || "Tag not created", "error");
+                                                return;
+                                            }
+
+                                            // 2. Create new option
+                                            const newTag = {
+                                                value: data._id || data.tag?._id, // depending on your API
+                                                label: inputValue,
+                                            };
+
+                                            // 3. Update dropdown list
+                                            setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
+
+                                            // 4. Select it immediately
+                                            const updatedIds = [...selectedTags, newTag.value];
+                                            setSelectedTags(updatedIds);
+
+                                            setGameById((prev) => ({
+                                                ...prev,
+                                                gameTags: updatedIds,
+                                            }));
+
+                                            Swal.fire("Added!", "Tag created successfully", "success");
+
+                                        } catch (err) {
+                                            console.log(err);
+                                            Swal.fire("Error", "Something went wrong", "error");
+                                        }
                                     }}
                                 />
 

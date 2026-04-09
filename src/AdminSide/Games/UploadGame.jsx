@@ -7,6 +7,9 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import UserContext from "../../ContextApi/UserContext";
 import Select from "react-select";
+import AddGameCategory from "../Category/AddGameCategory";
+import CreatableSelect from "react-select/creatable";
+import GameCatContext from "../../ContextApi/GameCatContext";
 
 const languages = [
     { code: "en", label: "English" },
@@ -38,16 +41,7 @@ export default function UploadGame() {
     const [featureListHtml, setFeatureListHtml] = useState("");
     const [controlsHtml, setControlsHtml] = useState("");
     const [allTags, setAllTags] = useState([])
-    const [categories, setCategories] = useState([]);
-
-    const fetchCategories = async () => {
-        const res = await fetch("https://edge.khelogy.com/api/category/nestedCategories");
-        const data = await res.json();
-        setCategories(data);
-    };
-    useEffect(() => {
-        fetchCategories();
-    }, []);
+    const { categories } = useContext(GameCatContext);
 
     const [gameData, setGameData] = useState({
         title: { en: "" },
@@ -317,42 +311,90 @@ export default function UploadGame() {
                                 {renderMultiLangInputs("title", "Game Title")}
 
                                 {/* 🔽 Other Game Fields */}
-                                <Form.Label>Category *</Form.Label>
+                                <Form.Label>Categories *</Form.Label>
                                 <Select
                                     isMulti
+                                    isSearchable   // ✅ enable search
                                     options={categoryOptions}
-                                    value={selectedCategories
-                                        .map((id) => categoryOptions.find(option => option.value === id))
-                                        .filter(Boolean) // remove any undefined in case id is missing
+                                    placeholder="Search categories..."
+                                    noOptionsMessage={() => "No category found"}
+                                    filterOption={(option, inputValue) =>
+                                        option.label.toLowerCase().includes(inputValue.toLowerCase())
                                     }
+                                    value={selectedCategories
+                                        .map((id) => categoryOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)}
                                     onChange={(selected) => {
-                                        // preserve the order in which the user selects
-                                        const ids = selected.map(item => item.value);
+                                        const ids = selected.map((s) => s.value);
                                         setSelectedCategories(ids);
-
-                                        setGameData(prev => ({
-                                            ...prev,
-                                            categoryIds: ids
-                                        }));
+                                        setGameData((prev) => ({ ...prev, categoryIds: ids }));
                                     }}
                                 />
+                                <AddGameCategory />
                                 <Form.Label>Tags</Form.Label>
-                                <Select
+                                <CreatableSelect
                                     isMulti
+                                    isSearchable
                                     options={tagOptions}
-                                    value={selectedTags
-                                        .map((id) => tagOptions.find(option => option.value === id))
-                                        .filter(Boolean) // remove any undefined in case id is missing
+                                    placeholder="Search or create tags..."
+                                    noOptionsMessage={({ inputValue }) =>
+                                        inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
                                     }
-                                    onChange={(selected) => {
-                                        // preserve the order in which the user selects
-                                        const ids = selected.map(item => item.value);
-                                        setSelectedTags(ids);
 
-                                        setGameData(prev => ({
-                                            ...prev,
-                                            gameTags: ids
-                                        }));
+                                    value={selectedTags
+                                        .map((id) => tagOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)
+                                    }
+
+                                    onChange={(selected) => {
+                                        const ids = selected.map((s) => s.value);
+                                        setSelectedTags(ids);
+                                        setGameData((prev) => ({ ...prev, gameTags: ids }));
+                                    }}
+
+                                    // ✅ THIS IS MAIN PART
+                                    onCreateOption={async (inputValue) => {
+                                        try {
+                                            // 1. Create tag in backend
+                                            const res = await fetch(`${apiUrl}/api/tags/addTags`, {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify({ tags: inputValue }),
+                                            });
+
+                                            const data = await res.json();
+
+                                            if (!res.ok) {
+                                                Swal.fire("Error", data.message || "Tag not created", "error");
+                                                return;
+                                            }
+
+                                            // 2. Create new option
+                                            const newTag = {
+                                                value: data._id || data.tag?._id, // depending on your API
+                                                label: inputValue,
+                                            };
+
+                                            // 3. Update dropdown list
+                                            setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
+
+                                            // 4. Select it immediately
+                                            const updatedIds = [...selectedTags, newTag.value];
+                                            setSelectedTags(updatedIds);
+
+                                            setGameData((prev) => ({
+                                                ...prev,
+                                                gameTags: updatedIds,
+                                            }));
+
+                                            Swal.fire("Added!", "Tag created successfully", "success");
+
+                                        } catch (err) {
+                                            console.log(err);
+                                            Swal.fire("Error", "Something went wrong", "error");
+                                        }
                                     }}
                                 />
                                 <Form.Group className="mb-3">
