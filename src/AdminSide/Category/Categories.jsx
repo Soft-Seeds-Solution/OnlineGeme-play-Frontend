@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Form, Modal, Nav, Table } from "react-bootstrap";
 import apiUrl from "../../ApiEndpoint";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp, faEdit, faEye, faSort, faSortDown, faSortUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
 import GameCatContext from "../../ContextApi/GameCatContext";
 import { useContext } from "react";
+import GameContext from "../../ContextApi/GameContext";
 
 export default function Categories() {
     const [categories, setCategories] = useState([]);
     const [searchTitle, setSearchTitle] = useState("")
     const [currentPage, setCurrentPage] = useState(1);
+    const [sortOrder, setSortOrder] = useState(null);
+    const { AllGames } = useContext(GameContext)
     const itemsPerPage = 25;
     const { purgeCache } = useContext(GameCatContext)
     const [getCatDataById, setGetCatDataById] = useState({});
@@ -236,10 +239,37 @@ export default function Categories() {
     };
 
     // pagination
+    const categoryGameCount = useMemo(() => {
+        const map = {};
+
+        AllGames?.forEach(game => {
+            game.categories?.forEach(cat => {
+                const id = typeof cat === "object" ? cat._id : cat;
+
+                if (!map[id]) map[id] = 0;
+                map[id]++;
+            });
+        });
+
+        return map;
+    }, [AllGames]);
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-    const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
+    let sortedCategories = [...filteredCategories];
+
+    if (sortOrder === "asc") {
+        sortedCategories.sort((a, b) =>
+            (categoryGameCount[a._id] || 0) - (categoryGameCount[b._id] || 0)
+        );
+    } else if (sortOrder === "desc") {
+        sortedCategories.sort((a, b) =>
+            (categoryGameCount[b._id] || 0) - (categoryGameCount[a._id] || 0)
+        );
+    }
+
+    const currentCategories = sortedCategories.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
@@ -255,7 +285,35 @@ export default function Categories() {
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Category</th>
+                                <th>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                        Category
+
+                                        <span
+                                            style={{
+                                                display: "inline-flex",
+                                                flexDirection: "column",
+                                                marginLeft: "6px",
+                                                cursor: "pointer",
+                                                lineHeight: "8px",
+                                                fontSize: "10px"
+                                            }}
+                                        >
+                                            <span
+                                                onClick={() => setSortOrder("asc")}
+                                                style={{ color: sortOrder === "asc" ? "#000" : "#ccc" }}
+                                            >
+                                                ▲
+                                            </span>
+                                            <span
+                                                onClick={() => setSortOrder("desc")}
+                                                style={{ color: sortOrder === "desc" ? "#000" : "#ccc" }}
+                                            >
+                                                ▼
+                                            </span>
+                                        </span>
+                                    </span>
+                                </th>
                                 <td>Index</td>
                                 <th>Actions</th>
                             </tr>
@@ -265,7 +323,7 @@ export default function Categories() {
                                 <tr key={cat._id}>
                                     <td>{indexOfFirstItem + ind + 1}</td>
                                     <td>
-                                        {"— ".repeat(cat.level)} {cat.category}
+                                        {"— ".repeat(cat.level)} {cat.category} ({categoryGameCount[cat._id] || 0})
                                     </td>
                                     <td>
                                         <Form.Check
