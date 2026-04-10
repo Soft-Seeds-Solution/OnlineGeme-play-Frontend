@@ -11,6 +11,7 @@ import ReactQuill from "react-quill";
 import Select from "react-select";
 import AddGameCategory from "../Category/AddGameCategory";
 import CreatableSelect from "react-select/creatable";
+import AddGameTags from "../Tags/AddGameTag";
 
 export default function EditUploadedGame({ gameId }) {
     const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } =
@@ -97,7 +98,7 @@ export default function EditUploadedGame({ gameId }) {
             shortDes: Object.keys(gameById.shortDes || { en: "" }),
             description: Object.keys(gameById.description || { en: "" }),
         });
-    }, [gameById?._id, allTags]);
+    }, [gameById?._id]);
 
     const handleLanguageChange = (langCode) => {
         setSelectedLanguages((prev) => {

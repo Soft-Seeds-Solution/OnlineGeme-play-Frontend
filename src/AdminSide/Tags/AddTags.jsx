@@ -117,7 +117,7 @@ export default function AddTags() {
             await fetch(`${apiUrl}/api/tags/delTag/${id}`, {
                 method: "DELETE"
             });
-            Swal.fire("Deleted!", "This game deleted successfully.", "success");
+            Swal.fire("Deleted!", "This tag deleted successfully.", "success");
             fetchTags();
         }
     };
