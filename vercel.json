@@ -1,5 +1,18 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "https://khelogy.com/:path*",
+      "destination": "https://www.khelogy.com/:path*",
+      "permanent": true
+    }
   ]
 }

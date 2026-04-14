@@ -1,97 +1,112 @@
 import './App.css'
 import "bootstrap/dist/css/bootstrap.min.css";
-import GameCatProvider from './ContextApi/GameCatProvider';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
-import Category from './AdminSide/GameCat/Category';
-import AdminPanel from './AdminSide/AdminPanel';
-import GamesIndexPage from './AdminSide/Games/GamesIndexPage';
+import { useContext, useEffect, useState, lazy } from 'react';
+
+import GameCatProvider from './ContextApi/GameCatProvider';
 import GameProvider from './ContextApi/GameProvider';
-import GamePage from './Pages/Home/GamePage';
-import GameDetailPage from './Pages/GameDetailPage';
-import Login from './Pages/authPage/Login';
 import UserProvider from './ContextApi/UserProvider';
-import { useContext } from 'react';
-import UserContext from './ContextApi/UserContext';
-import Page404 from './Pages/Page404';
-import GameCatPage from './Pages/GameCatPage';
-import AboutPage from './Pages/About/AboutPage';
-import Footer from './Components/Footer';
-import ContactPage from './Pages/Contact/ContactPage';
-import MoveToTop from './MoveToTop';
-import SignUp from './Pages/authPage/Signup';
 import TrackProvider from './ContextApi/TrackProvider';
-import UserPanel from './UserSide/UserPanel';
-import Favourites from './UserSide/Favourites';
-import RecentTrack from './UserSide/RecentTrack';
-import SearchGames from './Pages/SearchGames';
-import UserNavbar from './Components/UserNavbar';
-import AllCategories from './Pages/AllCategories';
-import TrackFavourites from './ContextApi/FavouriteProvider';
-import FeatureGame from './AdminSide/Games/FeatureGame';
-import TopLikeGames from './Pages/TopLikeGames';
-import TopViewGames from './Pages/TopViewGames';
-import UserUploadGame from './UserSide/UserUploadGame';
-import PendingGames from './AdminSide/Games/PendingGames';
-import RejectedGames from './AdminSide/Games/RejectedGames';
-import UserLayout from './Components/UserLayout';
-import { HelmetProvider } from 'react-helmet-async';
-import UploadedGamesRecord from './UserSide/UploadedGamesRecord';
-import usePageTracking from './hook/UsePageTracking';
-import UploadBlog from './AdminSide/Blogs/AddBlog';
 import BlogsProvider from './ContextApi/BlogsProvider';
-import Blogs from './Pages/Blogs/Blogs';
-import BlogDetail from './Pages/Blogs/BlogDetail';
-import UnPublish from './AdminSide/Games/UnPublish';
-import AddCategory from './AdminSide/Category/AddCategory';
-import Categories from './AdminSide/Category/Categories';
-import MainPage from './Pages/PrivacyPolicy/MainPage';
-import DisclaimerMainPage from './Pages/Disclaimer/DisclaimerMainPage';
-import TermsMainPage from './Pages/TermsAndConditions/TermsMainPage';
-import DMCAainPage from './Pages/DMCA/DMCAMainPage';
-import CookiesMainPage from './Pages/CookiesPolicy/CookiesMainPage';
-import AddTags from './AdminSide/Tags/AddTags';
-import GameTagPage from './Pages/GameTagPage';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import Loader from './Pages/Loader';
+import TrackFavourites from './ContextApi/FavouriteProvider';
+import UserContext from './ContextApi/UserContext';
 import GameContext from './ContextApi/GameContext';
 import GameCatContext from './ContextApi/GameCatContext';
 
-function App() {
+import MoveToTop from './MoveToTop';
+import Footer from './Components/Footer';
+import UserNavbar from './Components/UserNavbar';
+import UserLayout from './Components/UserLayout';
+import Loader from './Pages/Loader';
+import { HelmetProvider } from 'react-helmet-async';
+import usePageTracking from './hook/UsePageTracking';
 
+// ===================== LAZY IMPORTS =====================
+
+// Pages
+const GamePage = lazy(() => import('./Pages/Home/GamePage'));
+const GameDetailPage = lazy(() => import('./Pages/GameDetailPage'));
+const Login = lazy(() => import('./Pages/authPage/Login'));
+const SignUp = lazy(() => import('./Pages/authPage/Signup'));
+const SearchGames = lazy(() => import('./Pages/SearchGames'));
+const GameCatPage = lazy(() => import('./Pages/GameCatPage'));
+const GameTagPage = lazy(() => import('./Pages/GameTagPage'));
+const AboutPage = lazy(() => import('./Pages/About/AboutPage'));
+const ContactPage = lazy(() => import('./Pages/Contact/ContactPage'));
+const AllCategories = lazy(() => import('./Pages/AllCategories'));
+const TopLikeGames = lazy(() => import('./Pages/TopLikeGames'));
+const TopViewGames = lazy(() => import('./Pages/TopViewGames'));
+const Blogs = lazy(() => import('./Pages/Blogs/Blogs'));
+const BlogDetail = lazy(() => import('./Pages/Blogs/BlogDetail'));
+
+// Policies
+const MainPage = lazy(() => import('./Pages/PrivacyPolicy/MainPage'));
+const DisclaimerMainPage = lazy(() => import('./Pages/Disclaimer/DisclaimerMainPage'));
+const TermsMainPage = lazy(() => import('./Pages/TermsAndConditions/TermsMainPage'));
+const DMCAainPage = lazy(() => import('./Pages/DMCA/DMCAMainPage'));
+const CookiesMainPage = lazy(() => import('./Pages/CookiesPolicy/CookiesMainPage'));
+
+// Admin
+const AdminPanel = lazy(() => import('./AdminSide/AdminPanel'));
+const Category = lazy(() => import('./AdminSide/GameCat/Category'));
+const AddCategory = lazy(() => import('./AdminSide/Category/AddCategory'));
+const Categories = lazy(() => import('./AdminSide/Category/Categories'));
+const GamesIndexPage = lazy(() => import('./AdminSide/Games/GamesIndexPage'));
+const FeatureGame = lazy(() => import('./AdminSide/Games/FeatureGame'));
+const UnPublish = lazy(() => import('./AdminSide/Games/UnPublish'));
+const PendingGames = lazy(() => import('./AdminSide/Games/PendingGames'));
+const RejectedGames = lazy(() => import('./AdminSide/Games/RejectedGames'));
+const UploadBlog = lazy(() => import('./AdminSide/Blogs/AddBlog'));
+const AddTags = lazy(() => import('./AdminSide/Tags/AddTags'));
+
+// User
+const UserPanel = lazy(() => import('./UserSide/UserPanel'));
+const Favourites = lazy(() => import('./UserSide/Favourites'));
+const RecentTrack = lazy(() => import('./UserSide/RecentTrack'));
+const UserUploadGame = lazy(() => import('./UserSide/UserUploadGame'));
+const UploadedGamesRecord = lazy(() => import('./UserSide/UploadedGamesRecord'));
+
+import Page404 from './Pages/Page404';
+
+// ===================== APP =====================
+
+function App() {
   return (
-    <>
-      <Router>
-        <GameCatProvider>
-          <GameProvider>
-            <UserProvider>
-              <TrackProvider>
-                <BlogsProvider>
-                  <TrackFavourites>
-                    <MoveToTop />
-                    <UserNavbar />
-                    {/* <PrefetchGames /> */}
-                    <UserLayout />
-                    {/* <ExportGamesToJson /> */}
-                    <HelmetProvider>
-                      <GameRoutes />
-                    </HelmetProvider>
-                    <Footer />
-                  </TrackFavourites>
-                </BlogsProvider>
-              </TrackProvider>
-            </UserProvider>
-          </GameProvider>
-        </GameCatProvider>
-      </Router>
-    </>
+    <Router>
+      <GameCatProvider>
+        <GameProvider>
+          <UserProvider>
+            <TrackProvider>
+              <BlogsProvider>
+                <TrackFavourites>
+
+                  <MoveToTop />
+                  <UserNavbar />
+                  <UserLayout />
+
+                  <HelmetProvider>
+                    <GameRoutes />
+                  </HelmetProvider>
+
+                  <Footer />
+
+                </TrackFavourites>
+              </BlogsProvider>
+            </TrackProvider>
+          </UserProvider>
+        </GameProvider>
+      </GameCatProvider>
+    </Router>
   )
 }
 
 export default App
 
+// ===================== ROUTES =====================
+
 function GameRoutes() {
   usePageTracking()
+
   const { signUser } = useContext(UserContext)
   const { pathname } = useLocation()
   const { AllGames } = useContext(GameContext);
@@ -126,6 +141,7 @@ function GameRoutes() {
     { path: "/blogs", module: <Blogs /> },
     { path: "/blog/:postSlug", module: <BlogDetail /> },
   ];
+
   const adminRoutes = [
     {
       path: "/adminPanel",
@@ -144,6 +160,7 @@ function GameRoutes() {
       ],
     }
   ];
+
   const userRoutes = [
     {
       path: "/userPanel",
@@ -162,62 +179,41 @@ function GameRoutes() {
       {loading && <Loader />}
       <Routes>
 
+        {/* MAIN ROUTES */}
         {subRoutes.map((routes, index) => (
           <Route
             key={index}
             path={routes.path}
             element={routes.module}
-          >
-            {/* {
-              routes.subPaths.map((routes, index) => (
-                <Route
-                  key={index}
-                  path={routes.path}
-                  element={routes.module}
-                />
-              ))
-            } */}
-          </Route>
+          />
         ))}
-        {adminRoutes.map((routes, index) => (
-          pathname.includes("/adminPanel") && signUser?.role === "Admin" ?
-            <Route
-              key={index}
-              path={routes.path}
-              element={routes.module}
-            >
-              {
-                routes.subPaths.map((routes, index) => (
-                  <Route
-                    key={index}
-                    path={routes.path}
-                    element={routes.module}
-                  />
-                ))
-              }
+
+        {/* ADMIN ROUTES */}
+        {pathname.includes("/adminPanel") && signUser?.role === "Admin" &&
+          adminRoutes.map((routes, index) => (
+            <Route key={index} path={routes.path} element={routes.module}>
+              {routes.subPaths.map((r, i) => (
+                <Route key={i} path={r.path} element={r.module} />
+              ))}
             </Route>
-            : <Route key={index} path='*' element={<Page404 />} />
-        ))}
-        {userRoutes.map((routes, index) => (
-          pathname.includes("/userPanel") && signUser?.role === "User" ?
-            <Route
-              key={index}
-              path={routes.path}
-              element={routes.module}
-            >
-              {
-                routes.subPaths.map((routes, index) => (
-                  <Route
-                    key={index}
-                    path={routes.path}
-                    element={routes.module}
-                  />
-                ))
-              }
+          ))
+        }
+
+        {/* USER ROUTES */}
+        {pathname.includes("/userPanel") && signUser?.role === "User" &&
+          userRoutes.map((routes, index) => (
+            <Route key={index} path={routes.path} element={routes.module}>
+              {routes.subPaths.map((r, i) => (
+                <Route key={i} path={r.path} element={r.module} />
+              ))}
             </Route>
-            : <Route key={index} path='*' element={<Page404 />} />
-        ))}
-      </Routes >
+          ))
+        }
+
+        {/* 404 */}
+        <Route path="*" element={<Page404 />} />
+
+      </Routes>
     </>
   )
 }
