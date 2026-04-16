@@ -1,7 +1,13 @@
 {
   "redirects": [
     {
-      "source": "https://khelogy.com/:path*",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "khelogy.com"
+        }
+      ],
       "destination": "https://www.khelogy.com/:path*",
       "permanent": true
     }
