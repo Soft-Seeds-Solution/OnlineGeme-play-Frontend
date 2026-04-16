@@ -12,16 +12,7 @@
       "permanent": true
     }
   ],
-  "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "https://render-api.khelogy.com/sitemap.xml"
-    },
-    {
-      "source": "/sitemap-(.*).xml",
-      "destination": "https://render-api.khelogy.com/sitemap-$1.xml"
-    }
-  ],
+
   "routes": [
     {
       "src": "/sitemap.xml",
@@ -31,9 +22,11 @@
       "src": "/sitemap-(.*).xml",
       "dest": "https://render-api.khelogy.com/sitemap-$1.xml"
     },
+
     {
       "handle": "filesystem"
     },
+
     {
       "src": "/(.*)",
       "dest": "/index.html"
