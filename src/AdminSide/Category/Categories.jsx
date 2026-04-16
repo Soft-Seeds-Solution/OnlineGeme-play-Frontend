@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Form, Modal, Nav, Table } from "react-bootstrap";
 import apiUrl from "../../ApiEndpoint";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faEdit, faEye, faSort, faSortDown, faSortUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
 import GameCatContext from "../../ContextApi/GameCatContext";

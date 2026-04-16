@@ -1,18 +1,28 @@
 {
+  "redirects": [
+    {
+      "source": "https://khelogy.com/:path*",
+      "destination": "https://www.khelogy.com/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://render-api.khelogy.com/sitemap.xml"
+    },
+    {
+      "source": "/sitemap-(.*).xml",
+      "destination": "https://render-api.khelogy.com/sitemap-$1.xml"
+    }
+  ],
   "routes": [
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "destination": "https://www.khelogy.com/$1",
-      "permanent": true
+      "dest": "/index.html"
     }
   ]
 }

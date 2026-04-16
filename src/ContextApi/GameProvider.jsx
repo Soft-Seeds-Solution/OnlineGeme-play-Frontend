@@ -32,9 +32,12 @@ function GameProvider({ children }) {
 
     const uploadedGames = async () => {
         try {
-            const res = await fetch("https://edge.khelogy.com/api/games/uploadedd-games");
-
-            if (!res.ok) throw new Error("Fetch failed");
+            const res = await fetch("https://edge.khelogy.com/api/games/uploadedd-games", {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            })
 
             const data = await res.json();
 
