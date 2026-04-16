@@ -20,18 +20,13 @@
     },
 
     {
-      "src": "/sitemap-(.*).xml",
-      "dest": "https://render-api.khelogy.com/sitemap-$1.xml"
-    },
-
-    {
       "src": "/sitemap_game_category.xml",
       "dest": "https://render-api.khelogy.com/sitemap_game_category.xml"
     },
 
     {
-      "src": "/sitemap_(.*)_category.xml",
-      "dest": "https://render-api.khelogy.com/sitemap_$1_category.xml"
+      "src": "/pages.xml",
+      "dest": "https://render-api.khelogy.com/pages.xml"
     },
 
     {
