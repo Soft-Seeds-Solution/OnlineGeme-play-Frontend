@@ -24,6 +24,14 @@
   ],
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "dest": "https://render-api.khelogy.com/sitemap.xml"
+    },
+    {
+      "src": "/sitemap-(.*).xml",
+      "dest": "https://render-api.khelogy.com/sitemap-$1.xml"
+    },
+    {
       "handle": "filesystem"
     },
     {
