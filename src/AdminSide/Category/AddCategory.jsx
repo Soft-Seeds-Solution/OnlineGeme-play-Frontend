@@ -15,6 +15,7 @@ export default function AddCategory() {
         category: "",
         logo: "",
         description: "",
+        
         shortDes: "",
         parentId: "",
         faqs: [{ question: "", answer: "" }],

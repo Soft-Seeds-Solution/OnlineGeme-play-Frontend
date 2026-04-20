@@ -1098,4 +1098,19 @@ body.fullscreen-active {
     }
 }
 
+/* quill */
+.ql-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.ql-container {
+    max-height: 200px;
+}
+
+.ql-editor {
+    max-height: 200px;
+}
+
 /* git remote add origin https://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@github.com/Soft-Seeds-Solution/OnlineGeme-play-Frontend.git */

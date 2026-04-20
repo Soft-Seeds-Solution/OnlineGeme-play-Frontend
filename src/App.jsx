@@ -1,5 +1,6 @@
 import './App.css'
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-quill/dist/quill.snow.css';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
 import { useContext, useEffect, useState, lazy } from 'react';
 
