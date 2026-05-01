@@ -24,6 +24,7 @@
 
   if (hostname.includes("sourceplunge")) {
     logoUrl = "https://www.khelogy.com/sourceplunge-loading-logo.png";
+    console.log("HOSTNAME:", window.location.hostname);
   } else if (hostname.includes("khelogy")) {
     logoUrl = "https://www.khelogy.com/loading-logo.png";
   } else {
