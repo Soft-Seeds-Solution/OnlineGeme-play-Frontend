@@ -18,17 +18,29 @@
 
 // ✅ Detect domain and set logo
 (function () {
-  const script = document.currentScript;
-  const site = script?.getAttribute("data-site");
+  let hostname = window.location.hostname;
+
+  try {
+    // ✅ Get MAIN SITE hostname (important)
+    if (window.top && window.top.location) {
+      hostname = window.top.location.hostname;
+    }
+  } catch (e) {
+    // ❌ Cross-origin → cannot access parent
+    console.log("Cross-origin, using iframe hostname");
+  }
 
   let logoUrl = "";
 
-  if (site === "sourceplunge") {
+  if (hostname.includes("sourceplunge")) {
     logoUrl = "https://www.khelogy.com/sourceplunge-loading-logo.png";
   } else {
     logoUrl = "https://www.khelogy.com/loading-logo.png";
   }
 
+  console.log("FINAL HOSTNAME:", hostname);
+
+  // Inject loader
   document.write(`
     <div id="loading-screen">
       <canvas id="particle-canvas"></canvas>
