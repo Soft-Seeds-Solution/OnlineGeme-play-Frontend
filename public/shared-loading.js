@@ -18,21 +18,17 @@
 
 // ✅ Detect domain and set logo
 (function () {
-  const hostname = window.location.hostname;
+  const script = document.currentScript;
+  const site = script?.getAttribute("data-site");
 
   let logoUrl = "";
 
-  if (hostname.includes("sourceplunge")) {
+  if (site === "sourceplunge") {
     logoUrl = "https://www.khelogy.com/sourceplunge-loading-logo.png";
-    console.log("HOSTNAME:", window.location.hostname);
-  } else if (hostname.includes("khelogy")) {
-    logoUrl = "https://www.khelogy.com/loading-logo.png";
   } else {
-    // fallback
     logoUrl = "https://www.khelogy.com/loading-logo.png";
   }
 
-  // Inject loader
   document.write(`
     <div id="loading-screen">
       <canvas id="particle-canvas"></canvas>
