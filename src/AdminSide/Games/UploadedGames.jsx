@@ -2,8 +2,7 @@ import { useContext, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import GameContext from "../../ContextApi/GameContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import ViewUploadedGame from "./ViewUploadedGame";
+import { faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
 import EditUploadedGame from "./EditUploadedGame";
 import UserContext from "../../ContextApi/UserContext";
 import apiUrl from "../../ApiEndpoint";
@@ -115,7 +114,7 @@ export default function UploadedGames() {
                                     <td style={{ backgroundColor: "transparent", color: "black" }}>
                                         <button className="me-2 text-white" style={{ backgroundColor: "red", border: "none", fontSize: "15px", borderRadius: "5px" }}
                                             onClick={() => updateGameToUnPublishFn(gameData._id)} >UnPublish</button>
-                                        <ViewUploadedGame gameId={gameData._id} />
+                                        <a href={`https://www.khelogy.com/${gameData.title.en.toLowerCase().replace(/\s+/g, "-")}`} target="blnak"> <FontAwesomeIcon className="me-3 text-dark" icon={faEye} /></a>
                                         <EditUploadedGame gameId={gameData._id} />
                                         <FontAwesomeIcon icon={faTrash} onClick={() => deleteGame(gameData._id)} />
                                     </td>
@@ -145,12 +144,13 @@ export default function UploadedGames() {
                             Next
                         </Button>
                     </div>
-                </div>
+                </div >
             ) : (
                 <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
                     <p style={{ fontSize: "30px" }}>No Game Uploaded Yet</p>
                 </div>
-            )}
+            )
+            }
         </>
     )
 }

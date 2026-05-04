@@ -131,6 +131,28 @@ export default function UploadGame() {
         </>
     );
 
+    const renderQuillInputs = (field, label) => (
+        <>
+            <Form.Label className="fw-bold">{label}</Form.Label>
+
+            {selectedLanguages[field].map((langCode) => (
+                <div key={`${field}-${langCode}`} className="mb-3">
+                    <small className="d-block mb-1">
+                        {label} ({langCode.toUpperCase()})
+                    </small>
+
+                    <ReactQuill
+                        theme="snow"
+                        value={gameData[field][langCode] || ""}
+                        onChange={(value) =>
+                            handleInputChange(field, langCode, value)
+                        }
+                    />
+                </div>
+            ))}
+        </>
+    );
+
     const uploadGameFn = async (e) => {
         e.preventDefault();
 
@@ -309,6 +331,8 @@ export default function UploadGame() {
                         {activeTab === "form" && (
                             <>
                                 {renderMultiLangInputs("title", "Game Title")}
+                                {renderQuillInputs("shortDes", "Short Description")}
+                                {renderQuillInputs("description", "Full Description")}
 
                                 {/* 🔽 Other Game Fields */}
                                 <Form.Label>Categories *</Form.Label>
@@ -427,9 +451,6 @@ export default function UploadGame() {
                                         <option value="UnPublish">UnPublish</option>
                                     </Form.Control>
                                 </Form.Group>
-
-                                {renderMultiLangInputs("shortDes", "Short Description", "textarea")}
-                                {renderMultiLangInputs("description", "Full Description", "textarea")}
                                 <Form.Group className="mb-3">
                                     <Form.Label>How To Play</Form.Label>
                                     <ReactQuill theme="snow" value={howToPlayHtml} onChange={handleHowPlayChange} />

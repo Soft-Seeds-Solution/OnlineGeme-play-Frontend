@@ -11,7 +11,6 @@ import ReactQuill from "react-quill";
 import Select from "react-select";
 import AddGameCategory from "../Category/AddGameCategory";
 import CreatableSelect from "react-select/creatable";
-import AddGameTags from "../Tags/AddGameTag";
 
 export default function EditUploadedGame({ gameId }) {
     const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } =
@@ -117,7 +116,7 @@ export default function EditUploadedGame({ gameId }) {
         }));
     };
 
-    const renderMultiLangInputs = (field, label) => (
+    const renderTextInputs = (field, label) => (
         <>
             <Form.Label className="fw-bold mt-3">{label}</Form.Label>
             {selectedLanguages[field]?.map((lang) => (
@@ -129,6 +128,26 @@ export default function EditUploadedGame({ gameId }) {
                     value={gameById?.[field]?.[lang] || ""}
                     onChange={(e) => handleMultiLangChange(field, lang, e.target.value)}
                 />
+            ))}
+        </>
+    );
+
+    const renderQuillInputs = (field, label) => (
+        <>
+            <Form.Label className="fw-bold mt-3">{label}</Form.Label>
+            {selectedLanguages[field]?.map((lang) => (
+                <div key={`${field}-${lang}`} className="mb-3">
+                    <small className="d-block mb-1">
+                        {label} ({lang.toUpperCase()})
+                    </small>
+
+                    <ReactQuill
+                        value={gameById?.[field]?.[lang] || ""}
+                        onChange={(value) =>
+                            handleMultiLangChange(field, lang, value)
+                        }
+                    />
+                </div>
             ))}
         </>
     );
@@ -209,11 +228,6 @@ export default function EditUploadedGame({ gameId }) {
         }
     };
 
-    console.log(categories);
-    console.log(allTags);
-
-
-
     return (
         <>
             <FontAwesomeIcon icon={faEdit} className="me-3" onClick={openEditGame} />
@@ -252,9 +266,9 @@ export default function EditUploadedGame({ gameId }) {
 
                         {activeTab === "form" && (
                             <>
-                                {renderMultiLangInputs("title", "Game Title")}
-                                {renderMultiLangInputs("shortDes", "Short Description")}
-                                {renderMultiLangInputs("description", "Description")}
+                                {renderTextInputs("title", "Game Title")}
+                                {renderQuillInputs("shortDes", "Short Description")}
+                                {renderQuillInputs("description", "Description")}
 
                                 <Form.Label>Categories *</Form.Label>
                                 <Select
