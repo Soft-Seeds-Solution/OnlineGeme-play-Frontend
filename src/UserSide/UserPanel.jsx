@@ -15,30 +15,6 @@ import {
 export default function UserPanel() {
     const adminBar = [
         {
-            path: "add-category",
-            title: "Add Category",
-            type: "adminLinks",
-            icon: faListCheck,
-        },
-        {
-            path: "categories",
-            title: "All Categories",
-            type: "adminLinks",
-            icon: faListCheck,
-        },
-        {
-            path: "manage-tags",
-            title: "Manage Tags",
-            type: "adminLinks",
-            icon: faGamepad,
-        },
-        {
-            path: "manage-games",
-            title: "Manage Games",
-            type: "adminLinks",
-            icon: faGamepad,
-        },
-        {
             path: "favourites",
             title: "Favourites",
             type: "adminLinks",
@@ -68,7 +44,7 @@ export default function UserPanel() {
         <>
             <Container fluid className="page-content">
                 <Row className="admin-links">
-                    <Col md={3} className="pt-5" style={{ backgroundColor: "white", height: "100vh" }}>
+                    <Col md={3} className=" pt-5" style={{ backgroundColor: "var(--light-bg)", height: "100vh" }}>
                         {adminBar &&
                             adminBar.map((admin, index) => {
                                 return (

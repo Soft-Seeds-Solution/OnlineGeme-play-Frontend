@@ -49,76 +49,17 @@ export default function GameCatPage() {
         hasGameInCategory(cat)
     ) || [];
 
-    const breadcrumbItems = [
-        { name: "Home", path: "/", url: "https://www.khelogy.com/" },
-        ...(selectedCategoryObj?.ancestors
-            ?.map((catId) => {
-                const category = AllCategory.find((c) => c._id === catId);
-                return category
-                    ? { name: category.category, path: `/category/${category.catUrl}`, url: `https://www.khelogy.com/category/${category.catUrl}` }
-                    : null;
-            })
-            .filter(Boolean) || []),
-        ...(selectedCategoryObj
-            ? [{ name: selectedCategoryObj.category, path: `/category/${selectedCategoryObj?.catUrl}`, url: `https://www.khelogy.com/category/${selectedCategoryObj?.catUrl}` }]
-            : []),
-    ];
-
-    const faqItems = selectedCategoryObj?.faqs?.filter((faq) => faq.question || faq.answer) || [];
-
-    const sanitizeFaqAnswerHtml = (html) =>
-        html
-            ?.replace(/<span[^>]*background-color:\s*transparent;\s*color:\s*rgb\(0,\s*0,\s*0\);?[^>]*>/gi, "")
-            .replace(/<\/span>/gi, "")
-            .replace(/<p><\/p>/gi, "") || "";
-
-    const stripHtmlTags = (html) => html?.replace(/<[^>]+>/g, "") || "";
-
-    const pageTitle = selectedCategoryObj?.metaTitle || categoryName;
-    const pageDescription = selectedCategoryObj?.metaDes || stripHtmlTags(selectedCategoryObj?.shortDes);
-
-    const faqSchema = faqItems.map((faq) => ({
-        "@type": "Question",
-        name: faq.question || "",
-        acceptedAnswer: {
-            "@type": "Answer",
-            text: stripHtmlTags(sanitizeFaqAnswerHtml(faq.answer)),
-        },
-    }));
+    // Build breadcrumb dynamically using ancestors
+    const breadcrumb =
+        selectedCategoryObj?.ancestors
+            ?.map((catId) => AllCategory.find((c) => c._id === catId)?.category)
+            .filter(Boolean) || [];
+    if (categoryName) breadcrumb.push(categoryName);
 
     // Filter games that belong to this category
     const categoryGames = AllGames?.filter((game) =>
         game.categories?.some((cat) => cat.catUrl === categoryUrl)
     );
-
-    const itemListSchema = categoryGames?.map((game, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        item: {
-            "@type": "VideoGame",
-            name: game.title?.en || game.title || "",
-            url: `https://www.khelogy.com/${game.title?.en?.toLowerCase().replace(/\s+/g, "-")}`,
-            image: game.thumbnail || generalGameThumbnail,
-            description: game.shortDes?.en || "",
-        },
-    })) || [];
-
-    const categoryPageSchema = {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        name: pageTitle,
-        description: pageDescription,
-        url: `https://www.khelogy.com/category/${selectedCategoryObj?.catUrl}`,
-        isPartOf: {
-            "@type": "WebSite",
-            name: "Khelogy",
-            url: "https://www.khelogy.com",
-        },
-        primaryImageOfPage: {
-            "@type": "ImageObject",
-            url: selectedCategoryObj?.logo,
-        },
-    };
 
     if (!selectedCategoryObj) {
         return null; // or loading UI
@@ -132,7 +73,7 @@ export default function GameCatPage() {
 
                     <Helmet key={selectedCategoryObj?.catUrl}>
                         {/* Title */}
-                        <title>{pageTitle}</title>
+                        <title>{`${selectedCategoryObj.metaTitle}`}</title>
                         <meta
                             name="robots"
                             content={
@@ -145,99 +86,65 @@ export default function GameCatPage() {
                         {/* Meta */}
                         <meta
                             name="description"
-                            content={pageDescription}
+                            content={selectedCategoryObj.metaDes}
                         />
-                        {selectedCategoryObj.keywords && (
-                            <meta name="keywords" content={selectedCategoryObj.keywords} />
-                        )}
+                        <meta name="keywords" content={selectedCategoryObj.keywords} />
                         {/* Canonical */}
                         <link
                             rel="canonical"
-                            href={`https://www.khelogy.com/category/${selectedCategoryObj?.catUrl}`}
+                            href={`https://www.khelogy.com/category/${selectedCategoryObj.catUrl}`}
                         />
 
                         {/* Open Graph */}
                         <meta property="og:type" content="article" />
-                        <meta property="og:title" content={pageTitle} />
-                        <meta property="og:description" content={pageDescription} />
+                        <meta property="og:title" content={selectedCategoryObj.metaTitle} />
+                        <meta property="og:description" content={selectedCategoryObj.metaDes} />
                         <meta property="og:image" content={selectedCategoryObj.logo} />
-                        <meta property="og:url" content={`https://www.khelogy.com/category/${selectedCategoryObj?.catUrl}`} />
+                        <meta property="og:url" content={`https://www.khelogy.com/category/${selectedCategoryObj.catUrl}`} />
                         <meta property="og:site_name" content="Khelogy" />
 
                         {/* Twitter */}
                         <meta name="twitter:card" content="summary_large_image" />
-                        <meta name="twitter:title" content={pageTitle} />
-                        <meta name="twitter:description" content={pageDescription} />
+                        <meta name="twitter:title" content={selectedCategoryObj.metaTitle} />
+                        <meta name="twitter:description" content={selectedCategoryObj.metaDes} />
                         <meta name="twitter:image" content={selectedCategoryObj.logo} />
 
-                        {/* Page Schema */}
-                        <script type="application/ld+json">
-                            {JSON.stringify(categoryPageSchema)}
-                        </script>
+                        {/* Article Schema */}
                         <script type="application/ld+json">
                             {JSON.stringify({
                                 "@context": "https://schema.org",
-                                "@type": "CollectionPage",
-                                name: pageTitle,
-                                description: pageDescription,
-                                url: `https://www.khelogy.com/category/${selectedCategoryObj?.catUrl}`,
-                                publisher: {
+                                "@type": "VideoGame",
+                                "name": selectedCategoryObj.metaTitle,
+                                "description": selectedCategoryObj.metaDes,
+                                "image": selectedCategoryObj.logo,
+                                "url": window.location.href,
+                                "author": {
                                     "@type": "Organization",
-                                    name: "Khelogy",
-                                    logo: {
+                                    "name": "Khelogy"
+                                },
+                                "publisher": {
+                                    "@type": "Organization",
+                                    "name": "Khelogy",
+                                    "logo": {
                                         "@type": "ImageObject",
-                                        url: "https://www.khelogy.com/logo.png",
-                                    },
-                                },
-                                mainEntity: {
-                                    "@type": "ItemList",
-                                    itemListElement: itemListSchema,
-                                },
+                                        "url": "https://www.khelogy.com/logo.png"
+                                    }
+                                }
                             })}
                         </script>
-                        <script type="application/ld+json">
-                            {JSON.stringify({
-                                "@context": "https://schema.org",
-                                "@type": "BreadcrumbList",
-                                "itemListElement": breadcrumbItems.map((item, index) => ({
-                                    "@type": "ListItem",
-                                    "position": index + 1,
-                                    "name": item.name,
-                                    "item": item.url,
-                                })),
-                            })}
-                        </script>
-                        {faqSchema.length > 0 && (
-                            <script type="application/ld+json">
-                                {JSON.stringify({
-                                    "@context": "https://schema.org",
-                                    "@type": "FAQPage",
-                                    mainEntity: faqSchema,
-                                })}
-                            </script>
-                        )}
                     </Helmet>
 
                     {/* Breadcrumb & Category Title */}
                     <Row className="mt-2 mb-3">
                         <span className="heading-color sub-heading">
-                            {breadcrumbItems.map((item, index) => (
-                                <span key={index}>
-                                    {index > 0 && <span className="breadcrumb-separator"> &#8250; </span>}
-                                    {index === breadcrumbItems.length - 1 ? (
-                                        <span>{item.name}</span>
-                                    ) : (
-                                        <Link to={item.path} className="heading-color">
-                                            {item.name}
-                                        </Link>
-                                    )}
-                                </span>
-                            ))}
+                            <Link to="/" className="heading-color">Home</Link>{" "}
+                            / {breadcrumb.join(" / ")}
                         </span>
                         <h1 className="heading-color sub-heading">{categoryName}</h1>
                         <Col md={7}>
                             <p dangerouslySetInnerHTML={{ __html: selectedCategoryObj?.shortDes }}></p>
                         </Col>
+
                     </Row>
 
                     {/* Games Grid */}
@@ -273,25 +180,23 @@ export default function GameCatPage() {
 
 
             {/* Category Description & FAQs */}
-            <Container fluid className="mt-5 mb-5">
+            <Container fluid className="mt-4">
                 {/* Direct Subcategories */}
-                {directSubCategories.length > 0 && (
-                    <section>
-                        <Row>
-                            <h2 className="sub-heading">Related Categories</h2>
-                            {directSubCategories.map((cat) => (
-                                <Col key={cat._id} md={3}>
-                                    <Link to={`/category/${cat.catUrl}`}>
-                                        <div className="d-flex px-2 py-3 align-items-center gap-2 my-3 cat-bar">
-                                            {/* <Image src={cat.logo} style={{ width: "20%", borderRadius: "50px", backgroundColor: "var(--blue-color)" }} className="p-2" /> */}
-                                            <p className="game-Titles">{cat.category}</p>
-                                        </div>
-                                    </Link>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-                )}
+                <section>
+                    <Row>
+                        <h2 className="sub-heading">Related Categories</h2>
+                        {directSubCategories.map((cat) => (
+                            <Col key={cat._id} md={3}>
+                                <Link to={`/category/${cat.catUrl}`}>
+                                    <div className="d-flex px-2 py-3 align-items-center gap-2 my-3 cat-bar">
+                                        {/* <Image src={cat.logo} style={{ width: "20%", borderRadius: "50px", backgroundColor: "var(--blue-color)" }} className="p-2" /> */}
+                                        <p className="game-Titles">{cat.category}</p>
+                                    </div>
+                                </Link>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
                 <Row className="g-3">
                     <h2 className="sub-heading">Description</h2>
                     {selectedCategoryObj?.description && (
@@ -304,23 +209,24 @@ export default function GameCatPage() {
                             />
                         </>
                     )}
-                    {faqItems.length > 0 && (
-                        <section className="faq-container" aria-label="Frequently Asked Questions">
-                            <h2 className="faq-main-heading mb-3">FAQ&apos;s</h2>
+                    {selectedCategoryObj?.faqs?.filter(f => f.question || f.answer)?.length > 0 && (
+                        <div className="faq-container">
+                            <h2 className="faq-main-heading">FAQ&apos;s</h2>
 
                             <div className="faq-accordion">
-                                {faqItems.map((faq, i) => (
-                                    <article
+                                {selectedCategoryObj?.faqs?.map((faq, i) => (
+                                    <div
                                         className={`faq-item ${activeIndex === i ? "active" : ""}`}
                                         key={i}
                                     >
-                                        <div className="faq-question-header faq-question" onClick={() => toggleIndex(i)}>
-                                            <h3 style={{ fontSize: "0.95rem", lineHeight: 1.4 }}>{faq.question}</h3>
+                                        <h3 className="faq-question" onClick={() => toggleIndex(i)}>
+                                            {faq.question}
                                             <span className="icon">{activeIndex === i ? "-" : "+"}</span>
-                                        </div>
+                                        </h3>
 
                                         <div
-                                            className="faq-answer"
+                                            ref={(el) => (contentRefs.current[i] = el)}
+                                            className={`faq-answer`}
                                             style={{
                                                 maxHeight:
                                                     activeIndex === i
@@ -329,15 +235,14 @@ export default function GameCatPage() {
                                             }}
                                         >
                                             <div
-                                                ref={(el) => (contentRefs.current[i] = el)}
                                                 className="faq-answer-content"
-                                                dangerouslySetInnerHTML={{ __html: sanitizeFaqAnswerHtml(faq.answer) }}
+                                                dangerouslySetInnerHTML={{ __html: faq.answer }}
                                             />
                                         </div>
-                                    </article>
+                                    </div>
                                 ))}
                             </div>
-                        </section>
+                        </div>
                     )}
 
 

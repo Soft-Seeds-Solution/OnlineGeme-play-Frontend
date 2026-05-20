@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import GameContext from "../ContextApi/GameContext";
 import { Col, Container, Row } from "react-bootstrap";
 import generalGameThumbnail from "../assets/defaultGameThumbnail.jpg";
+import { Helmet } from "react-helmet-async";
 
 export default function GameTagPage() {
     const { tagGames } = useParams();
@@ -17,8 +18,23 @@ export default function GameTagPage() {
         game.gameTags?.some((tag) => tag.tags.toLowerCase() === changeTag.toLowerCase())
     );
 
+    const tagName =
+        AllGames?.find(game =>
+            game.gameTags?.some(tag =>
+                tag.tags.toLowerCase() === tagGames.replace(/-/g, " ").toLowerCase()
+            )
+        )?.gameTags?.find(tag =>
+            tag.tags.toLowerCase() === tagGames.replace(/-/g, " ").toLowerCase()
+        )?.tags;
+
     return (
         <div className="pt-5 px-6">
+            {tagName && (
+                <Helmet>
+                    <title>{tagName}</title>
+                    <meta name="robots" content="index, follow" />
+                </Helmet>
+            )}
             {taggGames && taggGames.length > 0 ? (
                 <>
                     <Container fluid style={{ marginTop: "50px" }}>

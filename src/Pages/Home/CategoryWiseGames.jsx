@@ -141,7 +141,7 @@ export default function CategoryWiseGames() {
                                     />
                                     {games.slice(0, 24).map((game, ind) => (
                                         <div key={ind} className="cat-div-width" style={{ flex: "0 0 auto" }}>
-                                            <Link to={`/${game.title.en.toLowerCase().replace(/\s+/g, "-")}`} draggable={false}
+                                            <Link to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`} draggable={false}
                                                 onDragStart={(e) => e.preventDefault()}
                                             >
                                                 <div

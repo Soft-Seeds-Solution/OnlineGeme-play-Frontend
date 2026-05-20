@@ -16,15 +16,31 @@
   }
 })();
 
-// shared-loading.js
-document.write(`
-  <!-- Loading Screen -->
-  <div id="loading-screen">
-    <canvas id="particle-canvas"></canvas>
-    <img class="loading-logo" src="https://www.khelogy.com/loading-logo.png" alt="Khelogy Logo" />
-    <div class="loading-bar-container">
-      <div class="loading-bar-fill" id="loading-bar"></div>
+// ✅ Detect domain and set logo
+(function () {
+  // ✅ get site from URL
+  const params = new URLSearchParams(window.location.search);
+  const site = params.get("site");
+
+  console.log("SITE:", site);
+
+  let logoUrl = "";
+
+  if (site === "sourceplunge") {
+    logoUrl = "https://www.khelogy.com/sourceplunge-loading-logo.png";
+  } else {
+    logoUrl = "https://www.khelogy.com/loading-logo.png";
+  }
+
+  // Inject loader
+  document.write(`
+    <div id="loading-screen">
+      <canvas id="particle-canvas"></canvas>
+      <img class="loading-logo" src="${logoUrl}" alt="Logo" />
+      <div class="loading-bar-container">
+        <div class="loading-bar-fill" id="loading-bar"></div>
+      </div>
+      <div class="loading-text" id="loading-text">Loading...</div>
     </div>
-    <div class="loading-text" id="loading-text">Loading...</div>
-  </div>
-`);
+  `);
+})();

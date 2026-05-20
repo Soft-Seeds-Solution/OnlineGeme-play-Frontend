@@ -11,7 +11,8 @@ function GameCatProvider({ children }) {
     const [selectedCategory, setSelectedCategory] = useState([]);
 
     const fetchCategories = async () => {
-        const url = "https://edge.khelogy.com/api/category/nestedCategories"
+        const url = "https://edge.khelogy.com/api/category/nestedCategories";
+
         const res = await fetch(url);
 
         const data = await res.json();
