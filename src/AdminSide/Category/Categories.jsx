@@ -8,6 +8,7 @@ import ReactQuill from "react-quill";
 import GameCatContext from "../../ContextApi/GameCatContext";
 import { useContext } from "react";
 import GameContext from "../../ContextApi/GameContext";
+import UserContext from "../../ContextApi/UserContext";
 
 export default function Categories() {
     const [categories, setCategories] = useState([]);
@@ -15,6 +16,7 @@ export default function Categories() {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortOrder, setSortOrder] = useState(null);
     const { AllGames } = useContext(GameContext)
+    const { signUser } = useContext(UserContext)
     const itemsPerPage = 25;
     const { purgeCache } = useContext(GameCatContext)
     const [getCatDataById, setGetCatDataById] = useState({});
@@ -171,6 +173,7 @@ export default function Categories() {
         formData.append("description", description);
         formData.append("shortDes", shortDes);
         formData.append("metaTitle", metaTitle);
+        formData.append("role", signUser?._id)
         formData.append("catIndex", catIndex);
         formData.append("metaDes", metaDes);
         formData.append("catUrl", catUrl);
@@ -197,7 +200,7 @@ export default function Categories() {
         );
 
         if (res.ok) {
-            Swal.fire("Saved!", "", "success");
+            Swal.fire("Category Send For Review To Admin!", "", "success");
             purgeCache()
             fetchCategories(true);
             setCatEditModal(false);
@@ -337,8 +340,12 @@ export default function Categories() {
                                         <a href={`https://www.khelogy.com/category/${cat.catUrl}`} target="blank">
                                             <FontAwesomeIcon icon={faEye} className="me-3" style={{ color: "black" }} />
                                         </a>
-                                        <FontAwesomeIcon icon={faEdit} className="me-3" onClick={() => openEditCat(cat._id)} />
-                                        <FontAwesomeIcon icon={faTrash} onClick={() => deleteCat(cat._id)} />
+                                        {signUser?.role?.permissions?.includes("edit games category") && (
+                                            <FontAwesomeIcon icon={faEdit} className="me-3" onClick={() => openEditCat(cat._id)} />
+                                        )}
+                                        {signUser?.role?.permissions?.includes("delete games category") && (
+                                            <FontAwesomeIcon icon={faTrash} onClick={() => deleteCat(cat._id)} />
+                                        )}
                                     </td>
                                 </tr>
                             ))}
