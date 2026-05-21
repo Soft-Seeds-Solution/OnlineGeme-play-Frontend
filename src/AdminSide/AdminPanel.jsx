@@ -38,6 +38,7 @@ export default function AdminPanel() {
             type: "adminLinks",
             icon: faGamepad,
         },
+        
         {
             path: "manage-games",
             title: "Manage Games",

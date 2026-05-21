@@ -15,6 +15,7 @@ export default function UploadedGames() {
     const { signUser } = useContext(UserContext)
     const [searchTitle, setSearchTitle] = useState("")
 
+    
     const userGames = signUser?.role === "Admin" ? AllGames : AllStatusGames.filter(game => game.userId?._id === signUser?._id)
 
     const filterGames = userGames?.filter(game => game.gameStatus !== "UnPublish").filter(gameData => gameData.featureGame !== "Yes").filter(gameData => gameData.title.en.toLowerCase().includes(searchTitle.toLowerCase()))

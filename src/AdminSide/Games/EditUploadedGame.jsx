@@ -259,6 +259,7 @@ export default function EditUploadedGame({ gameId }) {
                             <Nav.Item>
                                 <Nav.Link eventKey="form">Category Form</Nav.Link>
                             </Nav.Item>
+                            
                             <Nav.Item>
                                 <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
                             </Nav.Item>
