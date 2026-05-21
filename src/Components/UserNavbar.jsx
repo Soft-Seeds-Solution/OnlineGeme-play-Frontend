@@ -64,7 +64,7 @@ function UserNavbar() {
         } else {
             return [
                 { path: "/adminPanel/add-category", text: "Manage Categories" },
-                { path: "/adminPanel/manage-games", text: "Manage Games" },
+                { path: "/adminPanel/uploaded-games", text: "Manage Games" },
             ];
         }
     })();
