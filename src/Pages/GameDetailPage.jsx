@@ -83,7 +83,7 @@ export default function GameDetailPage() {
 
     const selectedGame = AllGames?.find(gameData => gameData.title?.en.toLowerCase() === gameTitle.toLowerCase())
 
-    const otherGames = AllGames?.filter(gameData => gameData.title.en.toLowerCase() !== gameTitle.toLowerCase()).filter(gameData => gameData.gameUrl !== selectedGame?.gameUrl);
+    const otherGames = AllGames?.filter(gameData => gameData?.title?.en.toLowerCase() !== gameTitle.toLowerCase()).filter(gameData => gameData.gameUrl !== selectedGame?.gameUrl);
 
     useEffect(() => {
         if (selectedGame) {
@@ -339,7 +339,7 @@ export default function GameDetailPage() {
                         {/* Canonical */}
                         <link
                             rel="canonical"
-                            href={`https://www.khelogy.com/${selectedGame.title.en.toLowerCase().replace(/\s+/g, "-")}`}
+                            href={`https://www.khelogy.com/${selectedGame?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
                         />
 
                         {/* Open Graph */}
@@ -633,7 +633,7 @@ export default function GameDetailPage() {
                                 >
                                     {AllGames?.filter(game => game.categoryId?._id === selectedGame.categoryId?._id).filter(game => game.gameUrl !== selectedGame.gameUrl).slice(0, 10).map((gameData, ind) => (
                                         <div key={ind} style={{ flex: "0 0 auto", width: isMobile ? "50px" : "180px" }}>
-                                            <Link to={`/${gameData.title.en.toLowerCase().replace(/\s+/g, "-")}`}>
+                                            <Link to={`/${gameData?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}>
                                                 <div
                                                     className="GameThumbnail"
                                                     style={{
@@ -687,7 +687,7 @@ export default function GameDetailPage() {
                                         {otherGames?.slice(0, 18).map((gameData, ind) => (
                                             <Col md={4} xs={4} key={ind}>
                                                 <Link
-                                                    to={`/${gameData.title.en.toLowerCase().replace(/\s+/g, "-")}`}
+                                                    to={`/${gameData?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
                                                 >
                                                     <div
                                                         className="GameThumbnail"
