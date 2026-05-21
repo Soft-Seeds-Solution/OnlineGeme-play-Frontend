@@ -13,6 +13,7 @@ import { Helmet } from 'react-helmet-async';
 export default function GameDetailPage() {
     const { title } = useParams();
     const gameTitle = title.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
     const { AllGames, updateLikesFn, updatePlayedFn, updateBackLikesFn, updateBackDisLikes, alreadyPlayed, setAlreadyPlayed, updateViewsFn } = useContext(GameContext);
     const { signUser } = useContext(UserContext);
     const { trackRecordFn } = useContext(TrackContext);
@@ -802,6 +803,6 @@ export default function GameDetailPage() {
 
             </div>
 
-        </main >
+        </main>
     );
 }

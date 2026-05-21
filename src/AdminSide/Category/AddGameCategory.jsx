@@ -4,11 +4,13 @@ import apiUrl from "../../ApiEndpoint";
 import { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import GameCatContext from "../../ContextApi/GameCatContext";
+import UserContext from "../../ContextApi/UserContext";
 
 export default function AddGameCategory() {
     const [activeTab, setActiveTab] = useState("form");
     const [catAddModal, setCatAddModal] = useState(false)
     const { fetchCacheCategories, purgeCache } = useContext(GameCatContext)
+    const { signUser } = useContext(UserContext)
     const [shortDescriptionHtml, setShortDescriptionHtml] = useState("");
     const [descriptionHtml, setDescriptionHtml] = useState("");
     const [selectParentUrl, setSelectParentUrl] = useState("")
@@ -66,6 +68,7 @@ export default function AddGameCategory() {
         formData.append("shortDes", shortDescriptionHtml)
         formData.append("metaDes", metaDes)
         formData.append("catIndex", catIndex)
+        formData.append("role", signUser?.role)
         formData.append("catUrl", catUrl)
         formData.append("keywords", keywords);
         if (parentId) {

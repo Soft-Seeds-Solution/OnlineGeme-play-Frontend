@@ -56,18 +56,32 @@ const GamesIndexPage = lazy(() => import('./AdminSide/Games/GamesIndexPage'));
 const FeatureGame = lazy(() => import('./AdminSide/Games/FeatureGame'));
 const UnPublish = lazy(() => import('./AdminSide/Games/UnPublish'));
 const PendingGames = lazy(() => import('./AdminSide/Games/PendingGames'));
+const UserRoles = lazy(() => import('./AdminSide/Roles/UserRoles'));
 const RejectedGames = lazy(() => import('./AdminSide/Games/RejectedGames'));
 const UploadBlog = lazy(() => import('./AdminSide/Blogs/AddBlog'));
 const AddTags = lazy(() => import('./AdminSide/Tags/AddTags'));
 
 // User
 const UserPanel = lazy(() => import('./UserSide/UserPanel'));
+const UserAddCategory = lazy(() => import('./UserSide/Category/UserAddCategory'));
+const UserCategories = lazy(() => import('./UserSide/Category/UserCategories'));
+const UserGamesIndexPage = lazy(() => import('./UserSide/Games/UserGamesIndexPage'));
 const Favourites = lazy(() => import('./UserSide/Favourites'));
 const RecentTrack = lazy(() => import('./UserSide/RecentTrack'));
 const UserUploadGame = lazy(() => import('./UserSide/UserUploadGame'));
 const UploadedGamesRecord = lazy(() => import('./UserSide/UploadedGamesRecord'));
 
 import Page404 from './Pages/Page404';
+import AddUserRoles from './AdminSide/Roles/AddUserRoles';
+import AddUser from './AdminSide/User/AddUser';
+import User from './AdminSide/User/AllUsers';
+import Header from './AdminSide/Header';
+import UploadGame from './AdminSide/Games/UploadGame';
+import EditUploadedGame from './AdminSide/Games/EditUploadedGame';
+import PendingUpdatedApprovalGames from './AdminSide/Games/PendingUpdatedApprovalGames';
+import PendingApprovalData from './AdminSide/Games/PendingApprovalData';
+import PendingUpdatedApprovalCat from './AdminSide/Category/PendingUpdatedApprovalCat';
+import PendingApprovalCatData from './AdminSide/Category/PendingApprovalCatData';
 
 // ===================== APP =====================
 
@@ -83,6 +97,7 @@ function App() {
 
                   <MoveToTop />
                   <UserNavbar />
+                  <Header />
                   <UserLayout />
 
                   <HelmetProvider>
@@ -150,11 +165,21 @@ function GameRoutes() {
       subPaths: [
         { path: "manage-categories", module: <Category /> },
         { path: "add-category", module: <AddCategory /> },
+        { path: "update-game/:title", module: <EditUploadedGame /> },
         { path: "all-categories", module: <Categories /> },
-        { path: "manage-games", module: <GamesIndexPage /> },
+        { path: "pending-approval-category", module: <PendingUpdatedApprovalCat /> },
+        { path: "pending-approval-category-Data/:category", module: <PendingApprovalCatData /> },
+        { path: "upload-game", module: <UploadGame /> },
+        { path: "uploaded-games", module: <GamesIndexPage /> },
+        { path: "pending-approval-games", module: <PendingUpdatedApprovalGames /> },
+        { path: "pending-approval-data/:title", module: <PendingApprovalData /> },
         { path: "feature-games", module: <FeatureGame /> },
         { path: "unpublish-games", module: <UnPublish /> },
         { path: "pending-games", module: <PendingGames /> },
+        { path: "add-user-roles", module: <AddUserRoles /> },
+        { path: "add-user", module: <AddUser /> },
+        { path: "all-users", module: <User /> },
+        { path: "user-roles", module: <UserRoles /> },
         { path: "rejected-games", module: <RejectedGames /> },
         { path: "upload-blog", module: <UploadBlog /> },
         { path: "manage-tags", module: <AddTags /> },
@@ -167,6 +192,9 @@ function GameRoutes() {
       path: "/userPanel",
       module: <UserPanel />,
       subPaths: [
+        { path: "add-category", module: <UserAddCategory /> },
+        { path: "categories", module: <UserCategories /> },
+        { path: "manage-games", module: <UserGamesIndexPage /> },
         { path: "favourites", module: <Favourites /> },
         { path: "recent-played-games", module: <RecentTrack /> },
         { path: "user-manage-game", module: <UserUploadGame /> },
@@ -190,18 +218,18 @@ function GameRoutes() {
         ))}
 
         {/* ADMIN ROUTES */}
-        {pathname.includes("/adminPanel") && signUser?.role === "Admin" &&
-          adminRoutes.map((routes, index) => (
-            <Route key={index} path={routes.path} element={routes.module}>
-              {routes.subPaths.map((r, i) => (
-                <Route key={i} path={r.path} element={r.module} />
-              ))}
-            </Route>
-          ))
-        }
+        {/* {pathname.includes("/adminPanel") && signUser?.role === "Admin" && */}
+        {adminRoutes.map((routes, index) => (
+          <Route key={index} path={routes.path} element={routes.module}>
+            {routes.subPaths.map((r, i) => (
+              <Route key={i} path={r.path} element={r.module} />
+            ))}
+          </Route>
+        ))}
+        {/* } */}
 
         {/* USER ROUTES */}
-        {pathname.includes("/userPanel") && signUser?.role === "User" &&
+        {/* {pathname.includes("/userPanel") && signUser?.role === "User" &&
           userRoutes.map((routes, index) => (
             <Route key={index} path={routes.path} element={routes.module}>
               {routes.subPaths.map((r, i) => (
@@ -209,7 +237,7 @@ function GameRoutes() {
               ))}
             </Route>
           ))
-        }
+        } */}
 
         {/* 404 */}
         <Route path="*" element={<Page404 />} />

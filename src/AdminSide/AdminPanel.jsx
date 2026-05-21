@@ -11,6 +11,7 @@ import {
     faGamepad,
     faListCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import Sidebar from "./Sidebar";
 
 export default function AdminPanel() {
     const adminBar = [
@@ -20,6 +21,30 @@ export default function AdminPanel() {
         //     type: "adminLinks",
         //     icon: faListCheck,
         // },
+        {
+            path: "add-user-roles",
+            title: "Add User Roles",
+            type: "adminLinks",
+            icon: faListCheck,
+        },
+        {
+            path: "user-roles",
+            title: "User Roles",
+            type: "adminLinks",
+            icon: faListCheck,
+        },
+        {
+            path: "add-user",
+            title: "Add User",
+            type: "adminLinks",
+            icon: faListCheck,
+        },
+        {
+            path: "all-users",
+            title: "Users",
+            type: "adminLinks",
+            icon: faListCheck,
+        },
         {
             path: "add-category",
             title: "Add Category",
@@ -78,10 +103,11 @@ export default function AdminPanel() {
 
     return (
         <>
-            <Container fluid className="page-content" style={{ backgroundColor: "#f2f5f8" }}>
+            <Container fluid style={{ backgroundColor: "#f2f5f8" }}>
                 <Row className="admin-links ">
-                    <Col md={3} className="bg-white pt-5" style={{ height: "100vh" }}>
-                        {adminBar &&
+                    <Col md={3}>
+                        <Sidebar />
+                        {/* {adminBar &&
                             adminBar.map((admin, index) => {
                                 return (
                                     <div key={index} className="admin-sidebar">
@@ -113,7 +139,7 @@ export default function AdminPanel() {
                                         )}
                                     </div>
                                 );
-                            })}
+                            })} */}
                     </Col>
                     <Col md={9} className="content-col-admin py-5">
                         <Outlet />
