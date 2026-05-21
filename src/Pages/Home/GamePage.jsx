@@ -62,7 +62,7 @@ export default function GamePage() {
                                         .slice(0, 20)
                                         .map((game, ind) => (
                                             <div key={ind} className="cat-div-width d-md-none" style={{ flex: "0 0 auto" }}>
-                                                <Link to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}>
+                                                <Link to={`/${game.title.en.toLowerCase().replace(/\s+/g, "-")}`}>
                                                     <div
                                                         className="GameThumbnail"
                                                         onClick={() => updateViewsFn(game._id)}
@@ -90,7 +90,7 @@ export default function GamePage() {
                                         [...AllGames]?.sort((a, b) => b.views - a.views).slice(0, 9).map((gameData, ind) => (
                                             <Col md={4} key={ind}>
                                                 <Link
-                                                    to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
+                                                    to={`/${gameData.title.en.toLowerCase().replace(/\s+/g, "-")}`}
                                                 >
                                                     <div
                                                         className={`GameThumbnail ${ind === 3 ? "lg-thumbnail" : ""}`}
@@ -140,7 +140,7 @@ export default function GamePage() {
                                         .slice(0, 20)
                                         .map((game, ind) => (
                                             <div key={ind} className="cat-div-width d-md-none" style={{ flex: "0 0 auto" }}>
-                                                <Link to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}>
+                                                <Link to={`/${game.title.en.toLowerCase().replace(/\s+/g, "-")}`}>
                                                     <div
                                                         className="GameThumbnail"
                                                         onClick={() => updateViewsFn(game._id)}
@@ -169,7 +169,7 @@ export default function GamePage() {
                                         [...AllGames]?.sort((a, b) => b.likes - a.likes).slice(0, 9).map((gameData, ind) => (
                                             <Col md={4} xs={12} key={ind} className="d-none d-md-block">
                                                 <Link
-                                                    to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
+                                                    to={`/${gameData.title.en.toLowerCase().replace(/\s+/g, "-")}`}
                                                 >
                                                     <div
                                                         className={`GameThumbnail ${ind === 3 ? "lg-thumbnail" : ""}`}

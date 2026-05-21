@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Button, Form, Modal, Nav } from "react-bootstrap";
+import { Button, Col, Container, Form, Modal, Nav, Row } from "react-bootstrap";
 import apiUrl from "../../ApiEndpoint";
 import GameContext from "../../ContextApi/GameContext";
 import Swal from "sweetalert2";
@@ -127,28 +127,6 @@ export default function UploadGame() {
                         }
                     />
                 </Form.Group>
-            ))}
-        </>
-    );
-
-    const renderQuillInputs = (field, label) => (
-        <>
-            <Form.Label className="fw-bold">{label}</Form.Label>
-
-            {selectedLanguages[field].map((langCode) => (
-                <div key={`${field}-${langCode}`} className="mb-3">
-                    <small className="d-block mb-1">
-                        {label} ({langCode.toUpperCase()})
-                    </small>
-
-                    <ReactQuill
-                        theme="snow"
-                        value={gameData[field][langCode] || ""}
-                        onChange={(value) =>
-                            handleInputChange(field, langCode, value)
-                        }
-                    />
-                </div>
             ))}
         </>
     );
@@ -289,258 +267,262 @@ export default function UploadGame() {
     }));
     return (
         <>
-            <div className="d-flex justify-content-end mb-4">
-                <Button className="primary-btn" onClick={() => setUploadGameModal(true)}>Upload Game</Button>
-            </div>
+            <Container>
+                <Row className="justify-content-center bg-white" style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.1)", borderRadius: "5px" }}>
+                    <Col md={12}>
 
-            <Modal size="lg" show={uploadGameModal} onHide={() => setUploadGameModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Upload Game</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form onSubmit={uploadGameFn}>
-                        <div id="gameDataError" className="text-danger text-center mb-3"></div>
+                        <Form onSubmit={uploadGameFn}>
+                            <div id="gameDataError" className="text-danger text-center mb-3"></div>
 
-                        {/* 🔤 Add Languages */}
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold">Add Translations:</Form.Label>
-                            <div className="d-flex flex-wrap">
-                                {languages.map((lang) => (
-                                    <Form.Check
-                                        key={lang.code}
-                                        inline
-                                        type="checkbox"
-                                        label={lang.label}
-                                        checked={selectedLanguages.title.includes(lang.code)}
-                                        onChange={() => handleLanguageChange(lang.code)}
-                                    />
-                                ))}
-                            </div>
-                        </Form.Group>
-                        <Nav variant="tabs"
-                            activeKey={activeTab}
-                            onSelect={(selectedKey) => setActiveTab(selectedKey)}>
-                            <Nav.Item>
-                                <Nav.Link eventKey="form">Category Form</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
-                            </Nav.Item>
-                        </Nav>
-
-                        {activeTab === "form" && (
-                            <>
-                                {renderMultiLangInputs("title", "Game Title")}
-                                {renderQuillInputs("shortDes", "Short Description")}
-                                {renderQuillInputs("description", "Full Description")}
-
-                                {/* 🔽 Other Game Fields */}
-                                <Form.Label>Categories *</Form.Label>
-                                <Select
-                                    isMulti
-                                    isSearchable   // ✅ enable search
-                                    options={categoryOptions}
-                                    placeholder="Search categories..."
-                                    noOptionsMessage={() => "No category found"}
-                                    filterOption={(option, inputValue) =>
-                                        option.label.toLowerCase().includes(inputValue.toLowerCase())
-                                    }
-                                    value={selectedCategories
-                                        .map((id) => categoryOptions.find((opt) => opt.value === id))
-                                        .filter(Boolean)}
-                                    onChange={(selected) => {
-                                        const ids = selected.map((s) => s.value);
-                                        setSelectedCategories(ids);
-                                        setGameData((prev) => ({ ...prev, categoryIds: ids }));
-                                    }}
-                                />
-                                <AddGameCategory />
-                                <Form.Label>Tags</Form.Label>
-                                <CreatableSelect
-                                    isMulti
-                                    isSearchable
-                                    options={tagOptions}
-                                    placeholder="Search or create tags..."
-                                    noOptionsMessage={({ inputValue }) =>
-                                        inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
-                                    }
-
-                                    value={selectedTags
-                                        .map((id) => tagOptions.find((opt) => opt.value === id))
-                                        .filter(Boolean)
-                                    }
-
-                                    onChange={(selected) => {
-                                        const ids = selected.map((s) => s.value);
-                                        setSelectedTags(ids);
-                                        setGameData((prev) => ({ ...prev, gameTags: ids }));
-                                    }}
-
-                                    // ✅ THIS IS MAIN PART
-                                    onCreateOption={async (inputValue) => {
-                                        try {
-                                            // 1. Create tag in backend
-                                            const res = await fetch(`${apiUrl}/api/tags/addTags`, {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type": "application/json",
-                                                },
-                                                body: JSON.stringify({ tags: inputValue }),
-                                            });
-
-                                            const data = await res.json();
-
-                                            if (!res.ok) {
-                                                Swal.fire("Error", data.message || "Tag not created", "error");
-                                                return;
-                                            }
-
-                                            // 2. Create new option
-                                            const newTag = {
-                                                value: data._id || data.tag?._id, // depending on your API
-                                                label: inputValue,
-                                            };
-
-                                            // 3. Update dropdown list
-                                            setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
-
-                                            // 4. Select it immediately
-                                            const updatedIds = [...selectedTags, newTag.value];
-                                            setSelectedTags(updatedIds);
-
-                                            setGameData((prev) => ({
-                                                ...prev,
-                                                gameTags: updatedIds,
-                                            }));
-
-                                            Swal.fire("Added!", "Tag created successfully", "success");
-
-                                        } catch (err) {
-                                            console.log(err);
-                                            Swal.fire("Error", "Something went wrong", "error");
-                                        }
-                                    }}
-                                />
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Game URL *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="gameUrl"
-                                        value={gameData.gameUrl}
-                                        onChange={onchange}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Thumbnail</Form.Label>
-                                    <Form.Control type="file" name="thumbnail" onChange={onchange} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Orientation *</Form.Label>
-                                    <Form.Control as="select" name="orientation" value={gameData.orientation} onChange={onchange}>
-                                        <option value="">Select Orientation</option>
-                                        <option value="potrait">Potrait</option>
-                                        <option value="landscape">Landscape</option>
-                                    </Form.Control>
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Status</Form.Label>
-                                    <Form.Control as="select" name="gameStatus" value={gameData.gameStatus} onChange={onchange}>
-                                        <option value="">Select Game Status</option>
-                                        <option value="Publish">Publish</option>
-                                        <option value="UnPublish">UnPublish</option>
-                                    </Form.Control>
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>How To Play</Form.Label>
-                                    <ReactQuill theme="snow" value={howToPlayHtml} onChange={handleHowPlayChange} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Feature List</Form.Label>
-                                    <ReactQuill theme="snow" value={featureListHtml} onChange={handleFeatureListChange} />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Controls</Form.Label>
-                                    <ReactQuill theme="snow" value={controlsHtml} onChange={handleControlsChange} />
-                                </Form.Group>
-
-                                <Form.Group className="mb-3">
-                                    <Form.Label>FAQs</Form.Label>
-                                    {gameData.faqs?.map((faq, i) => (
-                                        <div key={i} className="mb-2">
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Question"
-                                                value={faq.question}
-                                                onChange={(e) => updateFaq(i, "question", e.target.value)}
-                                                className="mb-1"
-                                            />
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Answer"
-                                                value={faq.answer}
-                                                onChange={(e) => updateFaq(i, "answer", e.target.value)}
-                                            />
-                                            <div className="mt-3" style={{ fontSize: "12px", border: "1px solid red", display: "inline-block" }} size="sm" type="button" onClick={() => removeFaq(i)}>Remove -</div>
-                                        </div>
+                            {/* 🔤 Add Languages */}
+                            <Form.Group className="mb-3">
+                                <Form.Label className="fw-bold">Add Translations:</Form.Label>
+                                <div className="d-flex flex-wrap">
+                                    {languages.map((lang) => (
+                                        <Form.Check
+                                            key={lang.code}
+                                            inline
+                                            type="checkbox"
+                                            label={lang.label}
+                                            checked={selectedLanguages.title.includes(lang.code)}
+                                            onChange={() => handleLanguageChange(lang.code)}
+                                        />
                                     ))}
-                                    <Button type="button" onClick={addFaq}>+ Add FAQ</Button>
-                                </Form.Group>
-                                {signUser?.role === "Admin" && (
-                                    <>
-                                        <Form.Group className="mb-3">
-                                            <Form.Label>Feature Game?</Form.Label>
-                                            <Form.Control as="select" name="featureGame" value={gameData.featureGame} onChange={onchange}>
-                                                <option value="">Select</option>
-                                                <option value="Yes">Yes</option>
-                                                <option value="No">No</option>
-                                            </Form.Control>
-                                        </Form.Group>
-                                    </>
-                                )}
-                            </>
-                        )}
+                                </div>
+                            </Form.Group>
+                            <Nav variant="tabs"
+                                activeKey={activeTab}
+                                onSelect={(selectedKey) => setActiveTab(selectedKey)}>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="form">Category Form</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="faq">Faq&apos;s</Nav.Link>
+                                </Nav.Item>
+                            </Nav>
 
-                        {activeTab === "seo" && (
-                            <>
-                                <Form.Group className="my-3">
-                                    <Form.Label>Meta Title</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="metaTitle"
-                                        value={gameData.metaTitle}
-                                        onChange={onchange}
-                                    />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Meta Descripton</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        name="metaDescription"
-                                        value={gameData.metaDescription}
-                                        onChange={onchange}
-                                    />
-                                </Form.Group>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Game Keywords</Form.Label>
-                                    <Form.Control
-                                        type='text'
-                                        className="my-3"
-                                        placeholder="keyword1, keyword2, keyword3"
-                                        name='gameKeywords'
-                                        value={gameData?.gameKeywords}
-                                        onChange={onchange}
-                                    />
-                                </Form.Group>
+                            {activeTab === "form" && (
+                                <>
+                                    {renderMultiLangInputs("title", "Game Title")}
 
-                            </>
-                        )}
-                        <div className="d-flex justify-content-center">
-                            <Button type="submit" className="primary-btn">Upload Game</Button>
-                        </div>
-                    </Form>
-                </Modal.Body>
-            </Modal>
+                                    {/* 🔽 Other Game Fields */}
+                                    <Form.Label>Categories *</Form.Label>
+                                    <Select
+                                        isMulti
+                                        isSearchable   // ✅ enable search
+                                        options={categoryOptions}
+                                        placeholder="Search categories..."
+                                        noOptionsMessage={() => "No category found"}
+                                        filterOption={(option, inputValue) =>
+                                            option.label.toLowerCase().includes(inputValue.toLowerCase())
+                                        }
+                                        value={selectedCategories
+                                            .map((id) => categoryOptions.find((opt) => opt.value === id))
+                                            .filter(Boolean)}
+                                        onChange={(selected) => {
+                                            const ids = selected.map((s) => s.value);
+                                            setSelectedCategories(ids);
+                                            setGameData((prev) => ({ ...prev, categoryIds: ids }));
+                                        }}
+                                    />
+                                    <AddGameCategory />
+                                    <Form.Label>Tags</Form.Label>
+                                    <CreatableSelect
+                                        isMulti
+                                        isSearchable
+                                        options={tagOptions}
+                                        placeholder="Search or create tags..."
+                                        noOptionsMessage={({ inputValue }) =>
+                                            inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
+                                        }
+
+                                        value={selectedTags
+                                            .map((id) => tagOptions.find((opt) => opt.value === id))
+                                            .filter(Boolean)
+                                        }
+
+                                        onChange={(selected) => {
+                                            const ids = selected.map((s) => s.value);
+                                            setSelectedTags(ids);
+                                            setGameData((prev) => ({ ...prev, gameTags: ids }));
+                                        }}
+
+                                        // ✅ THIS IS MAIN PART
+                                        onCreateOption={async (inputValue) => {
+                                            try {
+                                                // 1. Create tag in backend
+                                                const res = await fetch(`${apiUrl}/api/tags/addTags`, {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                    },
+                                                    body: JSON.stringify({ tags: inputValue }),
+                                                });
+
+                                                const data = await res.json();
+
+                                                if (!res.ok) {
+                                                    Swal.fire("Error", data.message || "Tag not created", "error");
+                                                    return;
+                                                }
+
+                                                // 2. Create new option
+                                                const newTag = {
+                                                    value: data._id || data.tag?._id, // depending on your API
+                                                    label: inputValue,
+                                                };
+
+                                                // 3. Update dropdown list
+                                                setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
+
+                                                // 4. Select it immediately
+                                                const updatedIds = [...selectedTags, newTag.value];
+                                                setSelectedTags(updatedIds);
+
+                                                setGameData((prev) => ({
+                                                    ...prev,
+                                                    gameTags: updatedIds,
+                                                }));
+
+                                                Swal.fire("Added!", "Tag created successfully", "success");
+
+                                            } catch (err) {
+                                                console.log(err);
+                                                Swal.fire("Error", "Something went wrong", "error");
+                                            }
+                                        }}
+                                    />
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Game URL *</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="gameUrl"
+                                            value={gameData.gameUrl}
+                                            onChange={onchange}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Thumbnail</Form.Label>
+                                        <Form.Control type="file" name="thumbnail" onChange={onchange} />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Orientation *</Form.Label>
+                                        <Form.Control as="select" name="orientation" value={gameData.orientation} onChange={onchange}>
+                                            <option value="">Select Orientation</option>
+                                            <option value="potrait">Potrait</option>
+                                            <option value="landscape">Landscape</option>
+                                        </Form.Control>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Status</Form.Label>
+                                        <Form.Control as="select" name="gameStatus" value={gameData.gameStatus} onChange={onchange}>
+                                            <option value="">Select Game Status</option>
+                                            <option value="Publish">Publish</option>
+                                            <option value="UnPublish">UnPublish</option>
+                                        </Form.Control>
+                                    </Form.Group>
+
+                                    {renderMultiLangInputs("shortDes", "Short Description", "textarea")}
+                                    {renderMultiLangInputs("description", "Full Description", "textarea")}
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>How To Play</Form.Label>
+                                        <ReactQuill theme="snow" value={howToPlayHtml} onChange={handleHowPlayChange} />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Feature List</Form.Label>
+                                        <ReactQuill theme="snow" value={featureListHtml} onChange={handleFeatureListChange} />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Controls</Form.Label>
+                                        <ReactQuill theme="snow" value={controlsHtml} onChange={handleControlsChange} />
+                                    </Form.Group>
+
+                                    {signUser?.role === "Admin" && (
+                                        <>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Feature Game?</Form.Label>
+                                                <Form.Control as="select" name="featureGame" value={gameData.featureGame} onChange={onchange}>
+                                                    <option value="">Select</option>
+                                                    <option value="Yes">Yes</option>
+                                                    <option value="No">No</option>
+                                                </Form.Control>
+                                            </Form.Group>
+                                        </>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === "seo" && (
+                                <>
+                                    <Form.Group className="my-3">
+                                        <Form.Label>Meta Title</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="metaTitle"
+                                            value={gameData.metaTitle}
+                                            onChange={onchange}
+                                        />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Meta Descripton</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            name="metaDescription"
+                                            value={gameData.metaDescription}
+                                            onChange={onchange}
+                                        />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Game Keywords</Form.Label>
+                                        <Form.Control
+                                            type='text'
+                                            className="my-3"
+                                            placeholder="keyword1, keyword2, keyword3"
+                                            name='gameKeywords'
+                                            value={gameData?.gameKeywords}
+                                            onChange={onchange}
+                                        />
+                                    </Form.Group>
+
+                                </>
+                            )}
+                            {activeTab === "faq" && (
+                                <>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>FAQs</Form.Label>
+                                        {gameData.faqs?.map((faq, i) => (
+                                            <div key={i} className="mb-2">
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Question"
+                                                    value={faq.question}
+                                                    onChange={(e) => updateFaq(i, "question", e.target.value)}
+                                                    className="mb-1"
+                                                />
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Answer"
+                                                    value={faq.answer}
+                                                    onChange={(e) => updateFaq(i, "answer", e.target.value)}
+                                                />
+                                                <div className="mt-3" style={{ fontSize: "12px", border: "1px solid red", display: "inline-block" }} size="sm" type="button" onClick={() => removeFaq(i)}>Remove -</div>
+                                            </div>
+                                        ))}
+                                        <Button type="button" onClick={addFaq}>+ Add FAQ</Button>
+                                    </Form.Group>
+                                </>
+                            )}
+                            <div className="d-flex justify-content-center">
+                                <Button type="submit" className="primary-btn">Upload Game</Button>
+                            </div>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
         </>
     );
 }
