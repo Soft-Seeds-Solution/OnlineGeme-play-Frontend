@@ -90,7 +90,7 @@ export default function GamePage() {
                                         [...AllGames]?.sort((a, b) => b.views - a.views).slice(0, 9).map((gameData, ind) => (
                                             <Col md={4} key={ind}>
                                                 <Link
-                                                    to={`/${gameData?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
+                                                    to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
                                                 >
                                                     <div
                                                         className={`GameThumbnail ${ind === 3 ? "lg-thumbnail" : ""}`}
@@ -169,7 +169,7 @@ export default function GamePage() {
                                         [...AllGames]?.sort((a, b) => b.likes - a.likes).slice(0, 9).map((gameData, ind) => (
                                             <Col md={4} xs={12} key={ind} className="d-none d-md-block">
                                                 <Link
-                                                    to={`/${gameData?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
+                                                    to={`/${game?.title?.en.toLowerCase().replace(/\s+/g, "-")}`}
                                                 >
                                                     <div
                                                         className={`GameThumbnail ${ind === 3 ? "lg-thumbnail" : ""}`}

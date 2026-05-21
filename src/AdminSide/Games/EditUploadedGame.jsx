@@ -1,7 +1,9 @@
 import { useContext, useState, useEffect } from "react";
-import { Button, Form, Image, Nav } from "react-bootstrap";
+import { Button, Form, Image, Modal, Nav } from "react-bootstrap";
 import GameContext from "../../ContextApi/GameContext";
 import GameCatContext from "../../ContextApi/GameCatContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import apiUrl from "../../ApiEndpoint";
 import Swal from "sweetalert2";
@@ -9,22 +11,15 @@ import ReactQuill from "react-quill";
 import Select from "react-select";
 import AddGameCategory from "../Category/AddGameCategory";
 import CreatableSelect from "react-select/creatable";
-import { useParams } from "react-router-dom";
-import UserContext from "../../ContextApi/UserContext";
 
-export default function EditUploadedGame() {
-    const { AllGames, gameById, uploadedCacheGames, setGameById, purgeGameCache } =
+export default function EditUploadedGame({ gameId }) {
+    const { gameById, getGameById, uploadedCacheGames, setGameById, purgeGameCache } =
         useContext(GameContext);
-    const { signUser } = useContext(UserContext)
     const { categories } = useContext(GameCatContext);
-    const { title } = useParams();
-    const gameTitle = title.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
+    const [gameEditModal, setGameEditModal] = useState(false);
     const [activeTab, setActiveTab] = useState("form");
-    const selectedGame = AllGames?.find(gameData => gameData.title?.en.toLowerCase() === gameTitle.toLowerCase())
-    useEffect(() => {
-        setGameById(selectedGame)
-    }, [selectedGame])
+
     const [allTags, setAllTags] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
@@ -69,6 +64,15 @@ export default function EditUploadedGame() {
 
     const tagOptions = allTags?.map((tag) => ({ value: tag._id, label: tag.tags }));
 
+    // Open modal only after game data fetched
+    const openEditGame = async () => {
+        setSelectedCategories([]);
+        setSelectedTags([]);
+        setGameById({});
+        await getGameById(gameId); // wait for fetch
+        setGameEditModal(true);
+    };
+
     // Update selected categories/tags after game and tags ready
     useEffect(() => {
         if (!gameById?._id || !allTags.length) return;
@@ -112,7 +116,7 @@ export default function EditUploadedGame() {
         }));
     };
 
-    const renderMultiLangInputs = (field, label) => (
+    const renderTextInputs = (field, label) => (
         <>
             <Form.Label className="fw-bold mt-3">{label}</Form.Label>
             {selectedLanguages[field]?.map((lang) => (
@@ -124,6 +128,26 @@ export default function EditUploadedGame() {
                     value={gameById?.[field]?.[lang] || ""}
                     onChange={(e) => handleMultiLangChange(field, lang, e.target.value)}
                 />
+            ))}
+        </>
+    );
+
+    const renderQuillInputs = (field, label) => (
+        <>
+            <Form.Label className="fw-bold mt-3">{label}</Form.Label>
+            {selectedLanguages[field]?.map((lang) => (
+                <div key={`${field}-${lang}`} className="mb-3">
+                    <small className="d-block mb-1">
+                        {label} ({lang.toUpperCase()})
+                    </small>
+
+                    <ReactQuill
+                        value={gameById?.[field]?.[lang] || ""}
+                        onChange={(value) =>
+                            handleMultiLangChange(field, lang, value)
+                        }
+                    />
+                </div>
             ))}
         </>
     );
@@ -178,7 +202,6 @@ export default function EditUploadedGame() {
         formData.append("thumbnail", gameById.thumbnail);
         formData.append("video", gameById.video);
         formData.append("gameUrl", gameById.gameUrl);
-        formData.append("role", signUser?._id);
         formData.append("howToPlay", gameById.howToPlay);
         formData.append("whoCreated", gameById.whoCreated);
         formData.append("orientation", gameById.orientation);
@@ -196,9 +219,10 @@ export default function EditUploadedGame() {
         });
 
         if (res.ok) {
-            Swal.fire("Games Send For Review To Admin!", "", "success");
+            Swal.fire("Saved!", "", "success");
             purgeGameCache();
             uploadedCacheGames();
+            setGameEditModal(false);
         } else {
             Swal.fire("Error saving changes", "", "error");
         }
@@ -206,216 +230,225 @@ export default function EditUploadedGame() {
 
     return (
         <>
-            <Form onSubmit={updateGameFn}>
-                {/* Language Selector */}
-                <Form.Group>
-                    <Form.Label>Add Translations</Form.Label>
-                    <div className="d-flex flex-wrap">
-                        {languages.map((lang) => (
-                            <Form.Check
-                                key={lang.code}
-                                inline
-                                type="checkbox"
-                                label={lang.label}
-                                checked={selectedLanguages.title.includes(lang.code)}
-                                onChange={() => handleLanguageChange(lang.code)}
-                            />
-                        ))}
-                    </div>
-                </Form.Group>
+            <FontAwesomeIcon icon={faEdit} className="me-3" onClick={openEditGame} />
 
-                <Nav variant="tabs" activeKey={activeTab} onSelect={setActiveTab}>
-                    <Nav.Item>
-                        <Nav.Link eventKey="form">Category Form</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
-                    </Nav.Item>
-                </Nav>
+            <Modal size="lg" show={gameEditModal} onHide={() => setGameEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Game Modal</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={updateGameFn}>
+                        {/* Language Selector */}
+                        <Form.Group>
+                            <Form.Label>Add Translations</Form.Label>
+                            <div className="d-flex flex-wrap">
+                                {languages.map((lang) => (
+                                    <Form.Check
+                                        key={lang.code}
+                                        inline
+                                        type="checkbox"
+                                        label={lang.label}
+                                        checked={selectedLanguages.title.includes(lang.code)}
+                                        onChange={() => handleLanguageChange(lang.code)}
+                                    />
+                                ))}
+                            </div>
+                        </Form.Group>
 
-                {activeTab === "form" && (
-                    <>
-                        {renderMultiLangInputs("title", "Game Title")}
-                        {renderMultiLangInputs("shortDes", "Short Description")}
-                        {renderMultiLangInputs("description", "Description")}
+                        <Nav variant="tabs" activeKey={activeTab} onSelect={setActiveTab}>
+                            <Nav.Item>
+                                <Nav.Link eventKey="form">Category Form</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
+                            </Nav.Item>
+                        </Nav>
 
-                        <Form.Label>Categories *</Form.Label>
-                        <Select
-                            isMulti
-                            isSearchable   // ✅ enable search
-                            options={categoryOptions}
-                            placeholder="Search categories..."
-                            noOptionsMessage={() => "No category found"}
-                            filterOption={(option, inputValue) =>
-                                option.label.toLowerCase().includes(inputValue.toLowerCase())
-                            }
-                            value={selectedCategories
-                                .map((id) => categoryOptions.find((opt) => opt.value === id))
-                                .filter(Boolean)}
-                            onChange={(selected) => {
-                                const ids = selected.map((s) => s.value);
-                                setSelectedCategories(ids);
-                                setGameById((prev) => ({ ...prev, categoryIds: ids }));
-                            }}
-                        />
-                        <AddGameCategory />
-                        <Form.Label>Tags</Form.Label>
-                        <CreatableSelect
-                            isMulti
-                            isSearchable
-                            options={tagOptions}
-                            placeholder="Search or create tags..."
-                            noOptionsMessage={({ inputValue }) =>
-                                inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
-                            }
+                        {activeTab === "form" && (
+                            <>
+                                {renderTextInputs("title", "Game Title")}
+                                {renderQuillInputs("shortDes", "Short Description")}
+                                {renderQuillInputs("description", "Description")}
 
-                            value={selectedTags
-                                .map((id) => tagOptions.find((opt) => opt.value === id))
-                                .filter(Boolean)
-                            }
-
-                            onChange={(selected) => {
-                                const ids = selected.map((s) => s.value);
-                                setSelectedTags(ids);
-                                setGameById((prev) => ({ ...prev, gameTags: ids }));
-                            }}
-
-                            // ✅ THIS IS MAIN PART
-                            onCreateOption={async (inputValue) => {
-                                try {
-                                    // 1. Create tag in backend
-                                    const res = await fetch(`${apiUrl}/api/tags/addTags`, {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify({ tags: inputValue }),
-                                    });
-
-                                    const data = await res.json();
-
-                                    if (!res.ok) {
-                                        Swal.fire("Error", data.message || "Tag not created", "error");
-                                        return;
+                                <Form.Label>Categories *</Form.Label>
+                                <Select
+                                    isMulti
+                                    isSearchable   // ✅ enable search
+                                    options={categoryOptions}
+                                    placeholder="Search categories..."
+                                    noOptionsMessage={() => "No category found"}
+                                    filterOption={(option, inputValue) =>
+                                        option.label.toLowerCase().includes(inputValue.toLowerCase())
+                                    }
+                                    value={selectedCategories
+                                        .map((id) => categoryOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)}
+                                    onChange={(selected) => {
+                                        const ids = selected.map((s) => s.value);
+                                        setSelectedCategories(ids);
+                                        setGameById((prev) => ({ ...prev, categoryIds: ids }));
+                                    }}
+                                />
+                                <AddGameCategory />
+                                <Form.Label>Tags</Form.Label>
+                                <CreatableSelect
+                                    isMulti
+                                    isSearchable
+                                    options={tagOptions}
+                                    placeholder="Search or create tags..."
+                                    noOptionsMessage={({ inputValue }) =>
+                                        inputValue ? `Press Enter to add "${inputValue}"` : "No tag found"
                                     }
 
-                                    // 2. Create new option
-                                    const newTag = {
-                                        value: data._id || data.tag?._id, // depending on your API
-                                        label: inputValue,
-                                    };
+                                    value={selectedTags
+                                        .map((id) => tagOptions.find((opt) => opt.value === id))
+                                        .filter(Boolean)
+                                    }
 
-                                    // 3. Update dropdown list
-                                    setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
+                                    onChange={(selected) => {
+                                        const ids = selected.map((s) => s.value);
+                                        setSelectedTags(ids);
+                                        setGameById((prev) => ({ ...prev, gameTags: ids }));
+                                    }}
 
-                                    // 4. Select it immediately
-                                    const updatedIds = [...selectedTags, newTag.value];
-                                    setSelectedTags(updatedIds);
+                                    // ✅ THIS IS MAIN PART
+                                    onCreateOption={async (inputValue) => {
+                                        try {
+                                            // 1. Create tag in backend
+                                            const res = await fetch(`${apiUrl}/api/tags/addTags`, {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify({ tags: inputValue }),
+                                            });
 
-                                    setGameById((prev) => ({
-                                        ...prev,
-                                        gameTags: updatedIds,
-                                    }));
+                                            const data = await res.json();
 
-                                    Swal.fire("Added!", "Tag created successfully", "success");
+                                            if (!res.ok) {
+                                                Swal.fire("Error", data.message || "Tag not created", "error");
+                                                return;
+                                            }
 
-                                } catch (err) {
-                                    console.log(err);
-                                    Swal.fire("Error", "Something went wrong", "error");
-                                }
-                            }}
-                        />
+                                            // 2. Create new option
+                                            const newTag = {
+                                                value: data._id || data.tag?._id, // depending on your API
+                                                label: inputValue,
+                                            };
 
-                        <Form.Control
-                            className="my-3"
-                            type="text"
-                            name="gameUrl"
-                            value={gameById?.gameUrl || ""}
-                            onChange={onchange}
-                            placeholder="Game URL"
-                        />
+                                            // 3. Update dropdown list
+                                            setAllTags((prev) => [...prev, { _id: newTag.value, tags: inputValue }]);
 
-                        {/* React Quill Fields */}
-                        <Form.Label>Controls *</Form.Label>
-                        <ReactQuill value={gameById?.controls} onChange={handleControlsChange} />
-                        <Form.Label>How To Play *</Form.Label>
-                        <ReactQuill value={gameById?.howToPlay} onChange={handleHowPlayChange} />
-                        <Form.Label>Feature List *</Form.Label>
-                        <ReactQuill value={gameById?.featureList} onChange={handleFeatureListChange} />
+                                            // 4. Select it immediately
+                                            const updatedIds = [...selectedTags, newTag.value];
+                                            setSelectedTags(updatedIds);
 
-                        {/* Thumbnail */}
-                        <Form.Control className="mb-3" type="file" name="thumbnail" onChange={onchange} />
-                        <Image src={gameById?.thumbnail} style={{ width: "100px" }} />
+                                            setGameById((prev) => ({
+                                                ...prev,
+                                                gameTags: updatedIds,
+                                            }));
 
-                        {/* FAQ */}
-                        {gameById.faqs?.map((faq, i) => (
-                            <div key={i}>
-                                <Form.Control
-                                    className="mb-1"
-                                    placeholder="Question"
-                                    value={faq.question}
-                                    onChange={(e) => updateFaq(i, "question", e.target.value)}
+                                            Swal.fire("Added!", "Tag created successfully", "success");
+
+                                        } catch (err) {
+                                            console.log(err);
+                                            Swal.fire("Error", "Something went wrong", "error");
+                                        }
+                                    }}
                                 />
+
                                 <Form.Control
-                                    className="mb-2"
-                                    placeholder="Answer"
-                                    value={faq.answer}
-                                    onChange={(e) => updateFaq(i, "answer", e.target.value)}
+                                    className="my-3"
+                                    type="text"
+                                    name="gameUrl"
+                                    value={gameById?.gameUrl || ""}
+                                    onChange={onchange}
+                                    placeholder="Game URL"
                                 />
-                                <Button size="sm" variant="danger" onClick={() => removeFaq(i)}>
-                                    Remove
+
+                                {/* React Quill Fields */}
+                                <Form.Label>Controls *</Form.Label>
+                                <ReactQuill value={gameById?.controls} onChange={handleControlsChange} />
+                                <Form.Label>How To Play *</Form.Label>
+                                <ReactQuill value={gameById?.howToPlay} onChange={handleHowPlayChange} />
+                                <Form.Label>Feature List *</Form.Label>
+                                <ReactQuill value={gameById?.featureList} onChange={handleFeatureListChange} />
+
+                                {/* Thumbnail */}
+                                <Form.Control className="mb-3" type="file" name="thumbnail" onChange={onchange} />
+                                <Image src={gameById?.thumbnail} style={{ width: "100px" }} />
+
+                                {/* FAQ */}
+                                {gameById.faqs?.map((faq, i) => (
+                                    <div key={i}>
+                                        <Form.Control
+                                            className="mb-1"
+                                            placeholder="Question"
+                                            value={faq.question}
+                                            onChange={(e) => updateFaq(i, "question", e.target.value)}
+                                        />
+                                        <Form.Control
+                                            className="mb-2"
+                                            placeholder="Answer"
+                                            value={faq.answer}
+                                            onChange={(e) => updateFaq(i, "answer", e.target.value)}
+                                        />
+                                        <Button size="sm" variant="danger" onClick={() => removeFaq(i)}>
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Button className="mt-2" onClick={addFaq}>
+                                    + Add FAQ
                                 </Button>
-                            </div>
-                        ))}
-                        <Button className="mt-2" onClick={addFaq}>
-                            + Add FAQ
-                        </Button>
 
-                        <Form.Group className="mb-3">
-                            <Form.Label>Feature Game?</Form.Label>
-                            <Form.Control as="select" name="featureGame" value={gameById.featureGame} onChange={onchange}>
-                                <option value="">Select</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </>
-                )}
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Feature Game?</Form.Label>
+                                    <Form.Control as="select" name="featureGame" value={gameById.featureGame} onChange={onchange}>
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </Form.Control>
+                                </Form.Group>
+                            </>
+                        )}
 
-                {activeTab === "seo" && (
-                    <>
-                        <Form.Control
-                            type="text"
-                            className="my-3"
-                            placeholder="keyword1, keyword2, keyword3"
-                            name="gameKeywords"
-                            value={gameById?.gameKeywords}
-                            onChange={onchange}
-                        />
-                        <Form.Control
-                            className="mb-3"
-                            type="text"
-                            name="metaTitle"
-                            value={gameById?.metaTitle || ""}
-                            onChange={onchange}
-                            placeholder="Meta Title"
-                        />
-                        <Form.Control
-                            className="mb-3"
-                            as="textarea"
-                            rows={3}
-                            name="metaDescription"
-                            value={gameById?.metaDescription || ""}
-                            onChange={onchange}
-                            placeholder="Meta Description"
-                        />
-                    </>
-                )}
+                        {activeTab === "seo" && (
+                            <>
+                                <Form.Control
+                                    type="text"
+                                    className="my-3"
+                                    placeholder="keyword1, keyword2, keyword3"
+                                    name="gameKeywords"
+                                    value={gameById?.gameKeywords}
+                                    onChange={onchange}
+                                />
+                                <Form.Control
+                                    className="mb-3"
+                                    type="text"
+                                    name="metaTitle"
+                                    value={gameById?.metaTitle || ""}
+                                    onChange={onchange}
+                                    placeholder="Meta Title"
+                                />
+                                <Form.Control
+                                    className="mb-3"
+                                    as="textarea"
+                                    rows={3}
+                                    name="metaDescription"
+                                    value={gameById?.metaDescription || ""}
+                                    onChange={onchange}
+                                    placeholder="Meta Description"
+                                />
+                            </>
+                        )}
 
-                <div className="text-center mt-4">
-                    <Button type="submit">Update Game</Button>
-                </div>
-            </Form>
+                        <div className="text-center mt-4">
+                            <Button type="submit">Update Game</Button>
+                        </div>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     );
 }

@@ -1,15 +1,13 @@
-import { Form, Button, Nav, Container, Row, Col } from "react-bootstrap";
+import { Form, Button, Nav } from "react-bootstrap";
 import Swal from "sweetalert2";
 import apiUrl from "../../ApiEndpoint";
 import { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import GameCatContext from "../../ContextApi/GameCatContext";
-import UserContext from "../../ContextApi/UserContext";
 
 export default function AddCategory() {
     const [activeTab, setActiveTab] = useState("form");
     const { fetchCacheCategories, purgeCache } = useContext(GameCatContext)
-    const { signUser } = useContext(UserContext)
     const [shortDescriptionHtml, setShortDescriptionHtml] = useState("");
     const [descriptionHtml, setDescriptionHtml] = useState("");
     const [selectParentUrl, setSelectParentUrl] = useState("")
@@ -17,7 +15,7 @@ export default function AddCategory() {
         category: "",
         logo: "",
         description: "",
-
+        
         shortDes: "",
         parentId: "",
         faqs: [{ question: "", answer: "" }],
@@ -66,7 +64,6 @@ export default function AddCategory() {
         formData.append("description", descriptionHtml);
         formData.append("metaTitle", metaTitle)
         formData.append("shortDes", shortDescriptionHtml)
-        formData.append("role", signUser?.role)
         formData.append("metaDes", metaDes)
         formData.append("catIndex", catIndex)
         formData.append("catUrl", catUrl)
@@ -168,143 +165,131 @@ export default function AddCategory() {
 
     return (
         <>
-            <Container>
-                <Row className="justify-content-center bg-white" style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.1)", borderRadius: "5px" }}>
-                    <Col>
 
-                        <Form className='form-group admin-form p-3' onSubmit={AddCategory} style={{ boxShadow: "none" }}>
-                            <div id='categoryError' className='text-center text-danger'></div>
-                            <Nav variant="tabs"
-                                activeKey={activeTab}
-                                onSelect={(selectedKey) => setActiveTab(selectedKey)}>
-                                <Nav.Item>
-                                    <Nav.Link eventKey="form">Category Form</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link eventKey="faq">Faq&apos;s</Nav.Link>
-                                </Nav.Item>
-                            </Nav>
-                            {activeTab === "form" && (
-                                <>
-                                    <Form.Group className="my-3" controlId="category">
-                                        <Form.Label>Category</Form.Label>
-                                        <Form.Control type='text' placeholder="Add Category" name='category' value={catCredentials.category} onChange={onchange} />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3" controlId="category">
-                                        <Form.Label>Category Logo</Form.Label>
-                                        <Form.Control type='file' placeholder="Add Category" name='logo' onChange={onchange} />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3" controlId="description">
-                                        <Form.Label>Short Description</Form.Label>
-                                        <ReactQuill theme="snow" value={shortDescriptionHtml} onChange={handleShortDesChange} />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Description</Form.Label>
-                                        <ReactQuill theme="snow" value={descriptionHtml} onChange={handleDesChange} />
-                                    </Form.Group>
-                                    <Form.Select
-                                        className="mb-3"
-                                        name="parentId"
-                                        value={catCredentials.parentId}
-                                        onChange={onchange}
-                                    >
-                                        <option value="">Parent</option>
-                                        {renderOptions(categories)}
-                                    </Form.Select>
-                                </>
-                            )}
+            <Form className='form-group admin-form p-3' onSubmit={AddCategory} style={{ boxShadow: "none" }}>
+                <div id='categoryError' className='text-center text-danger'></div>
+                <Nav variant="tabs"
+                    activeKey={activeTab}
+                    onSelect={(selectedKey) => setActiveTab(selectedKey)}>
+                    <Nav.Item>
+                        <Nav.Link eventKey="form">Category Form</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="seo">SEO Specific</Nav.Link>
+                    </Nav.Item>
+                </Nav>
+                {activeTab === "form" && (
+                    <>
+                        <Form.Group className="my-3" controlId="category">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control type='text' placeholder="Add Category" name='category' value={catCredentials.category} onChange={onchange} />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="category">
+                            <Form.Label>Category Logo</Form.Label>
+                            <Form.Control type='file' placeholder="Add Category" name='logo' onChange={onchange} />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="description">
+                            <Form.Label>Short Description</Form.Label>
+                            <ReactQuill theme="snow" value={shortDescriptionHtml} onChange={handleShortDesChange} />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Description</Form.Label>
+                            <ReactQuill theme="snow" value={descriptionHtml} onChange={handleDesChange} />
+                        </Form.Group>
+                        <Form.Select
+                            className="mb-3"
+                            name="parentId"
+                            value={catCredentials.parentId}
+                            onChange={onchange}
+                        >
+                            <option value="">Parent</option>
+                            {renderOptions(categories)}
+                        </Form.Select>
 
-                            {activeTab === "seo" && (
-                                <>
-                                    <Form.Group className="my-3" controlId="category">
-                                        <Form.Label>Meta Title</Form.Label>
-                                        <Form.Control type='text' placeholder="Meta Title" name='metaTitle' value={catCredentials.metaTitle} onChange={onchange} />
-                                    </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>FAQs</Form.Label>
+                            {catCredentials.faqs?.map((faq, i) => (
+                                <div key={i} className="mb-2">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Question"
+                                        value={faq.question}
+                                        onChange={(e) => updateFaq(i, "question", e.target.value)}
+                                        className="mb-1"
+                                    />
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={faq.answer}
+                                        onChange={(value) => updateFaq(i, "answer", value)}
+                                    />
+                                    <div className="mt-3" style={{ fontSize: "12px", border: "1px solid red", display: "inline-block" }} size="sm" type="button" onClick={() => removeFaq(i)}>Remove -</div>
+                                </div>
+                            ))}
+                            <Button type="button" onClick={addFaq}>+ Add FAQ</Button>
+                        </Form.Group>
+                    </>
+                )}
 
-                                    <Form.Group className="my-3" controlId="category">
-                                        <Form.Label>Category Url</Form.Label>
-                                        <Form.Control
-                                            type='text'
-                                            placeholder="Category URL"
-                                            name='catUrl'
-                                            value={catCredentials.catUrl}
-                                            onChange={onchange}
-                                        />
-                                    </Form.Group>
+                {activeTab === "seo" && (
+                    <>
+                        <Form.Group className="my-3" controlId="category">
+                            <Form.Label>Meta Title</Form.Label>
+                            <Form.Control type='text' placeholder="Meta Title" name='metaTitle' value={catCredentials.metaTitle} onChange={onchange} />
+                        </Form.Group>
 
-                                    <Form.Group className="mb-3" controlId="description">
-                                        <Form.Label>Meta Description</Form.Label>
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={4}
-                                            placeholder="Add category description"
-                                            name="metaDes"
-                                            value={catCredentials.metaDes}
-                                            onChange={onchange}
-                                        />
-                                    </Form.Group>
-                                    <Form.Group className="my-3" controlId="category">
-                                        <Form.Label>Meta Keywords</Form.Label>
-                                        <Form.Control
-                                            type='text'
-                                            placeholder="keyword1, keyword2, keyword3"
-                                            name='keywords'
-                                            value={catCredentials.keywords}
-                                            onChange={onchange}
-                                        />
-                                    </Form.Group>
+                        <Form.Group className="my-3" controlId="category">
+                            <Form.Label>Category Url</Form.Label>
+                            <Form.Control
+                                type='text'
+                                placeholder="Category URL"
+                                name='catUrl'
+                                value={catCredentials.catUrl}
+                                onChange={onchange}
+                            />
+                        </Form.Group>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Indexing</Form.Label>
-                                        <Form.Select
-                                            name="catIndex"
-                                            value={catCredentials.catIndex}
-                                            onChange={onchange}
-                                        >
-                                            <option value="">Select Category Indexing</option>
-                                            <option value="index">Index</option>
-                                            <option value="noIndex">No Index</option>
-                                        </Form.Select>
-                                    </Form.Group>
+                        <Form.Group className="mb-3" controlId="description">
+                            <Form.Label>Meta Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={4}
+                                placeholder="Add category description"
+                                name="metaDes"
+                                value={catCredentials.metaDes}
+                                onChange={onchange}
+                            />
+                        </Form.Group>
+                        <Form.Group className="my-3" controlId="category">
+                            <Form.Label>Meta Keywords</Form.Label>
+                            <Form.Control
+                                type='text'
+                                placeholder="keyword1, keyword2, keyword3"
+                                name='keywords'
+                                value={catCredentials.keywords}
+                                onChange={onchange}
+                            />
+                        </Form.Group>
 
-                                </>
-                            )}
-                            {activeTab === "faq" && (
-                                <>
-                                    <Form.Group className="my-3">
-                                        <Form.Label>FAQs</Form.Label>
-                                        {catCredentials.faqs?.map((faq, i) => (
-                                            <div key={i} className="mb-2">
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="Question"
-                                                    value={faq.question}
-                                                    onChange={(e) => updateFaq(i, "question", e.target.value)}
-                                                    className="mb-1"
-                                                />
-                                                <ReactQuill
-                                                    theme="snow"
-                                                    value={faq.answer}
-                                                    onChange={(value) => updateFaq(i, "answer", value)}
-                                                />
-                                                <div className="mt-3" style={{ fontSize: "12px", border: "1px solid red", display: "inline-block" }} size="sm" type="button" onClick={() => removeFaq(i)}>Remove -</div>
-                                            </div>
-                                        ))}
-                                        <Button type="button" onClick={addFaq}>+ Add FAQ</Button>
-                                    </Form.Group>
-                                </>
-                            )}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Indexing</Form.Label>
+                            <Form.Select
+                                name="catIndex"
+                                value={catCredentials.catIndex}
+                                onChange={onchange}
+                            >
+                                <option value="">Select Category Indexing</option>
+                                <option value="index">Index</option>
+                                <option value="noIndex">No Index</option>
+                            </Form.Select>
+                        </Form.Group>
 
-                            <div className="text-center">
-                                <Button type='submit' className='primary-btn mt-3 text-white'>Add Category</Button>
-                            </div>
-                        </Form>
-                    </Col>
-                </Row>
-            </Container>
+                    </>
+                )}
+
+                <div className="text-center">
+                    <Button type='submit' className='primary-btn mt-3 text-white'>Add Category</Button>
+                </div>
+            </Form>
         </>
     )
 }
