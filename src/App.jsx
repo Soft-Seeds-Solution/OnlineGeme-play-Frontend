@@ -30,6 +30,7 @@ const GameDetailPage = lazy(() => import('./Pages/GameDetailPage'));
 const Login = lazy(() => import('./Pages/authPage/Login'));
 const SignUp = lazy(() => import('./Pages/authPage/Signup'));
 const SearchGames = lazy(() => import('./Pages/SearchGames'));
+const GameLinks = lazy(() => import('./Pages/GamesLinks'));
 const GameCatPage = lazy(() => import('./Pages/GameCatPage'));
 const GameTagPage = lazy(() => import('./Pages/GameTagPage'));
 const AboutPage = lazy(() => import('./Pages/About/AboutPage'));
@@ -151,6 +152,7 @@ function GameRoutes() {
     { path: "/userLogin", module: <Login /> },
     { path: "/signup", module: <SignUp /> },
     { path: "/search", module: <SearchGames /> },
+    { path: "/game-links", module: <GameLinks /> },
     { path: "/all-categories", module: <AllCategories /> },
     { path: "/popular-games", module: <TopLikeGames /> },
     { path: "/top-views-games", module: <TopViewGames /> },

@@ -142,6 +142,12 @@ function UserNavbar() {
                                             <span>Home</span>
                                         </Nav>
                                     </Link>
+                                    <Link to="/game-links" className={`header-text ${isActive("/game-links") ? "activeHeader" : ""}`}>
+                                        <Nav className="me-3 d-flex align-items-center">
+                                            <FontAwesomeIcon icon={faHome} className="p-1 me-2 icon" />
+                                            <span>Game Links</span>
+                                        </Nav>
+                                    </Link>
                                     <Link to="/about-us" className={`header-text ${isActive("/about-us") ? "activeHeader" : ""}`}>
                                         <Nav className="me-3 d-flex align-items-center">
                                             <FontAwesomeIcon icon={faInfoCircle} className="p-1 me-2 icon" />

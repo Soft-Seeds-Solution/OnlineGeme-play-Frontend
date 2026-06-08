@@ -13,7 +13,7 @@ function GameProvider({ children }) {
     const [alreadyPlayed, setAlreadyPlayed] = useState(false)
 
     const uploadedCacheGames = async () => {
-        const url = "https://edge.khelogy.com/api/games/uploadedd-games?fresh=1"
+        const url = "http://localhost:8000/api/games/uploadedd-games?fresh=1"
 
         const res = await fetch(url + "&t=" + Date.now(), {
             cache: "no-store"
@@ -32,7 +32,7 @@ function GameProvider({ children }) {
 
     const uploadedGames = async () => {
         try {
-            const res = await fetch("https://edge.khelogy.com/api/games/uploadedd-games", {
+            const res = await fetch("http://localhost:8000/api/games/uploadedd-games", {
                 method: "GET",
                 headers: {
                     "Accept": "application/json"
